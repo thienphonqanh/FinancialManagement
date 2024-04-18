@@ -2,6 +2,8 @@ import { MongoClient, Db, Collection } from 'mongodb'
 import { config } from 'dotenv'
 import User from '~/models/schemas/User.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
+import CashFlow from '~/models/schemas/CashFlow.schemas'
+import CashFlowCategory from '~/models/schemas/CashFlowCategory.schemas'
 
 config()
 
@@ -33,6 +35,14 @@ class DatabaseService {
 
   get money_accounts(): Collection<MoneyAccount> {
     return this.db.collection(process.env.DB_MONEY_ACCOUNTS_COLLECTION as string)
+  }
+
+  get cash_flows(): Collection<CashFlow> {
+    return this.db.collection(process.env.DB_CASH_FLOWS_COLLECTION as string)
+  }
+
+  get cash_flow_categories(): Collection<CashFlowCategory> {
+    return this.db.collection(process.env.DB_CASH_FLOW_CATEGORIES_COLLECTION as string)
   }
 }
 
