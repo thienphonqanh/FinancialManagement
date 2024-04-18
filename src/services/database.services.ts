@@ -1,6 +1,7 @@
 import { MongoClient, Db, Collection } from 'mongodb'
 import { config } from 'dotenv'
 import User from '~/models/schemas/User.schemas'
+import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 
 config()
 
@@ -28,6 +29,10 @@ class DatabaseService {
 
   get users(): Collection<User> {
     return this.db.collection(process.env.DB_USERS_COLLECTION as string)
+  }
+
+  get money_accounts(): Collection<MoneyAccount> {
+    return this.db.collection(process.env.DB_MONEY_ACCOUNTS_COLLECTION as string)
   }
 }
 

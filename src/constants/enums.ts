@@ -9,3 +9,8 @@ export enum GenderType {
   Female, // Nữ
   Another // Khác
 }
+
+export enum IncludedReport {
+  NotIncluded, // Không bao gồm, mặc định = 0
+  Included // Bao gồm
+}
