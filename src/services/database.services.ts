@@ -4,7 +4,7 @@ import User from '~/models/schemas/User.schemas'
 
 config()
 
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.kuuplfy.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@financialmanagement.kiplzgn.mongodb.net/`
 
 class DatabaseService {
   private client: MongoClient
