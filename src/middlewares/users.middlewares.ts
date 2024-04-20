@@ -3,6 +3,8 @@ import { validate } from '~/utils/validation'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ParamSchema } from 'express-validator'
 import usersService from '~/services/users.services'
+import databaseService from '~/services/database.services'
+import { hashPassword } from '~/utils/crypto'
 
 const nameSchema: ParamSchema = {
   notEmpty: {
@@ -81,6 +83,38 @@ const confirmPasswordSchema: ParamSchema = {
     }
   }
 }
+
+export const loginValidator = validate(
+  checkSchema(
+    {
+      email: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED
+        },
+        isEmail: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+        },
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            const user = await databaseService.users.findOne({
+              email: value,
+              password: hashPassword(req.body.password)
+            })
+            if (user === null) {
+              throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
+            }
+            req.user = user
+
+            return true
+          }
+        }
+      },
+      password: passwordSchema
+    },
+    ['body']
+  )
+)
 
 export const registerValidator = validate(
   checkSchema(

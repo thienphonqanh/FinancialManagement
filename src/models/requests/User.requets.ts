@@ -8,6 +8,11 @@ export interface RegisterReqBody {
   confirm_password: string
 }
 
+export interface LoginReqBody {
+  email: string
+  password: string
+}
+
 export interface TokenPayload extends JwtPayload {
   user_id: string
   token_type: TokenType
