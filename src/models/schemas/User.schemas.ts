@@ -6,11 +6,11 @@ interface UserType {
   name: string
   email: string
   password: string
-  gender: GenderType
-  verify: UserVerifyStatus
-  dob: Date
-  role: Role
-  created_at: Date
+  gender?: GenderType
+  verify?: UserVerifyStatus
+  dob?: Date
+  role?: Role
+  created_at?: Date
   updated_at?: Date // Optional
   avatar?: string // Optional
   money_account_id?: ObjectId[] // Optional
