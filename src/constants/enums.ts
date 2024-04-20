@@ -14,3 +14,8 @@ export enum IncludedReport {
   NotIncluded, // Không bao gồm, mặc định = 0
   Included // Bao gồm
 }
+
+export enum Role {
+  Admin, // Quản trị viên, mặc định = 0
+  User // Người dùng
+}

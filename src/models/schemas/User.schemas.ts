@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { GenderType, UserVerifyStatus } from '~/constants/enums'
+import { GenderType, UserVerifyStatus, Role } from '~/constants/enums'
 
 interface UserType {
   _id?: ObjectId
@@ -10,6 +10,7 @@ interface UserType {
   gender: GenderType
   verify: UserVerifyStatus
   dob: Date
+  role: Role
   created_at: Date
   updated_at?: Date // Optional
   money_account_id?: ObjectId[] // Optional
@@ -29,6 +30,7 @@ export default class User {
   gender: GenderType
   verify: UserVerifyStatus
   dob: Date
+  role: Role
   created_at: Date
   updated_at: Date // Optional
   money_account_id: ObjectId[] // Optional
@@ -48,6 +50,7 @@ export default class User {
     this.gender = user.gender || GenderType.Male
     this.verify = user.verify || UserVerifyStatus.Unverified
     this.dob = user.dob || date
+    this.role = user.role || Role.User
     this.created_at = user.created_at || date
     this.updated_at = user.updated_at || date
     this.money_account_id = user.money_account_id || []
