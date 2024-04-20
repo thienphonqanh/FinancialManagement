@@ -19,3 +19,10 @@ export enum Role {
   Admin, // Quản trị viên, mặc định = 0
   User // Người dùng
 }
+
+export enum TokenType {
+  AccessToken,
+  RefreshToken,
+  EmailVerifyToken,
+  ForgotPasswordToken
+}

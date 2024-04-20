@@ -4,6 +4,7 @@ import User from '~/models/schemas/User.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import CashFlow from '~/models/schemas/CashFlow.schemas'
 import CashFlowCategory from '~/models/schemas/CashFlowCategory.schemas'
+import RefreshToken from '~/models/schemas/Refresh.schemas'
 
 config()
 
@@ -33,15 +34,19 @@ class DatabaseService {
     return this.db.collection(process.env.DB_USERS_COLLECTION as string)
   }
 
-  get money_accounts(): Collection<MoneyAccount> {
+  get refreshTokens(): Collection<RefreshToken> {
+    return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
+  }
+
+  get moneyAccounts(): Collection<MoneyAccount> {
     return this.db.collection(process.env.DB_MONEY_ACCOUNTS_COLLECTION as string)
   }
 
-  get cash_flows(): Collection<CashFlow> {
+  get cashFlows(): Collection<CashFlow> {
     return this.db.collection(process.env.DB_CASH_FLOWS_COLLECTION as string)
   }
 
-  get cash_flow_categories(): Collection<CashFlowCategory> {
+  get cashFlowCategories(): Collection<CashFlowCategory> {
     return this.db.collection(process.env.DB_CASH_FLOW_CATEGORIES_COLLECTION as string)
   }
 }
