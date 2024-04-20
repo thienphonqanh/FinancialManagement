@@ -4,7 +4,6 @@ import { GenderType, UserVerifyStatus, Role } from '~/constants/enums'
 interface UserType {
   _id?: ObjectId
   name: string
-  avatar: string
   email: string
   password: string
   gender: GenderType
@@ -13,6 +12,7 @@ interface UserType {
   role: Role
   created_at: Date
   updated_at?: Date // Optional
+  avatar?: string // Optional
   money_account_id?: ObjectId[] // Optional
   phone?: string // Optional
   address?: string // Optional
@@ -44,9 +44,9 @@ export default class User {
     const date = new Date()
     this._id = user._id || new ObjectId()
     this.name = user.name
-    this.avatar = user.avatar
     this.email = user.email
     this.password = user.password
+    this.avatar = user.avatar || ''
     this.gender = user.gender || GenderType.Male
     this.verify = user.verify || UserVerifyStatus.Unverified
     this.dob = user.dob || date
