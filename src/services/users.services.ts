@@ -7,6 +7,8 @@ import { signToken, verifyToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
 import { config } from 'dotenv'
 import RefreshToken from '~/models/schemas/Refresh.schemas'
+import { sendVerifyRegisterEmail } from '~/utils/email'
+import { verify } from 'crypto'
 
 config()
 class UsersService {
@@ -112,6 +114,35 @@ class UsersService {
         exp
       })
     )
+    // Gửi email verify
+    await sendVerifyRegisterEmail(payload.email, email_verify_token)
+
+    return { access_token, refresh_token }
+  }
+
+  async verifyEmail(user_id: string) {
+    const [token] = await Promise.all([
+      this.signAccessAndRefeshToken({
+        user_id,
+        verify: UserVerifyStatus.Verified
+      }),
+      databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+        {
+          $set: {
+            email_verify_token: '',
+            verify: UserVerifyStatus.Verified,
+            updated_at: '$$NOW'
+          }
+        }
+      ])
+    ])
+
+    const [access_token, refresh_token] = token
+    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
+    )
+
     return { access_token, refresh_token }
   }
 }
