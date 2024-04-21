@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { registerController, loginController } from '~/controllers/users.controllers'
+import { registerController, loginController, logoutController } from '~/controllers/users.controllers'
 import {
   registerValidator,
   loginValidator,
@@ -25,5 +25,14 @@ usersRouter.post('/login', loginValidator, wrapRequesHandler(loginController))
  * Body: { name: string, email: string, password: string, confirm_password: string }
  */
 usersRouter.post('/register', registerValidator, wrapRequesHandler(registerController))
+
+/**
+ * Description. Logout a user
+ * Path: /logout
+ * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: { refresh_token: string }
+ */
+usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequesHandler(logoutController))
 
 export default usersRouter

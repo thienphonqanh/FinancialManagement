@@ -7,6 +7,7 @@ import { signToken, verifyToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
 import { config } from 'dotenv'
 import RefreshToken from '~/models/schemas/Refresh.schemas'
+import { USERS_MESSAGES } from '~/constants/messages'
 
 config()
 class UsersService {
@@ -113,6 +114,11 @@ class UsersService {
       })
     )
     return { access_token, refresh_token }
+  }
+
+  async logout(refresh_token: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token })
+    return true
   }
 }
 
