@@ -68,18 +68,18 @@ class UsersService {
   }
 
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-    const [accessToken, refreshToken] = await this.signAccessAndRefeshToken({ user_id, verify })
-    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
+    const [access_token, refresh_token] = await this.signAccessAndRefeshToken({ user_id, verify })
+    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
         user_id: new ObjectId(user_id),
-        token: refreshToken,
+        token: refresh_token,
         iat,
         exp
       })
     )
-    return { accessToken, refreshToken }
+    return { access_token, refresh_token }
   }
 
   async register(payload: RegisterReqBody) {
@@ -98,21 +98,21 @@ class UsersService {
       })
     )
 
-    const [accessToken, refreshToken] = await this.signAccessAndRefeshToken({
+    const [access_token, refresh_token] = await this.signAccessAndRefeshToken({
       user_id: user_id.toString(),
       verify: UserVerifyStatus.Unverified
     })
-    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
+    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
         user_id: new ObjectId(user_id),
-        token: refreshToken,
+        token: refresh_token,
         iat,
         exp
       })
     )
-    return { accessToken, refreshToken }
+    return { access_token, refresh_token }
   }
 }
 
