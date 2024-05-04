@@ -72,11 +72,9 @@ export const sendVerifyRegisterEmail = (
 ) => {
   return sendVerifyEmail(
     toAddress,
-    'Verify your email',
+    'Xác thực tài khoản!',
     template
-      .replace('{{title}}', 'Please verify your email')
-      .replace('{{content}}', 'Click the button below to verify your email')
-      .replace('{{titleLink}}', 'Verify')
+      .replace('{{email}}', toAddress)
       .replace('{{link}}', `${process.env.VERIFY_EMAIL_URL}/email-verifications?token=${email_verify_token}`)
   )
 }
