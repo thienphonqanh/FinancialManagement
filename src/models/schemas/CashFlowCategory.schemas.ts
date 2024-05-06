@@ -6,7 +6,7 @@ interface CashFlowCategoryType {
   name: string
   cash_flow_id: ObjectId
   sub_category?: []
-  created_at: Date
+  created_at?: Date
   updated_at?: Date
 }
 

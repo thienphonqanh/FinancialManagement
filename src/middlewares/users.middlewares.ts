@@ -1,5 +1,5 @@
 import { checkSchema } from 'express-validator'
-import { Request } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { validate } from '~/utils/validation'
 import { USERS_MESSAGES } from '~/constants/messages'
@@ -12,6 +12,8 @@ import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { verifyToken } from '~/utils/jwt'
 import { ObjectId } from 'mongodb'
+import { TokenPayload } from '~/models/requests/User.requets'
+import { UserVerifyStatus } from '~/constants/enums'
 
 const nameSchema: ParamSchema = {
   notEmpty: {
@@ -365,3 +367,11 @@ export const resetPasswordValidator = validate(
     ['body']
   )
 )
+
+export const verifiedUserValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decoded_authorization as TokenPayload
+  if (verify !== UserVerifyStatus.Verified) {
+    return next(new ErrorWithStatus({ message: USERS_MESSAGES.USER_NOT_VERIFIED, status: HTTP_STATUS.FORBIDDEN }))
+  }
+  next()
+}

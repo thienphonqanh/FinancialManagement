@@ -39,3 +39,8 @@ export const USERS_MESSAGES = {
   USER_NOT_VERIFIED: 'User not verified',
   REFRESH_TOKEN_SUCCESS: 'Refresh token success'
 } as const
+
+export const ADMINS_MESSAGES = {
+  ADD_CASH_FLOW_SUCCESS: 'Thêm dòng tiền thành công',
+  ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công'
+} as const

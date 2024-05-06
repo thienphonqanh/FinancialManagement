@@ -4,7 +4,7 @@ interface CashFlowType {
   _id: ObjectId
   icon: string
   name: string
-  isCheck: number // 0: false, 1: true
+  isCheck?: number // 0: false, 1: true
 }
 
 export default class CashFlow {
