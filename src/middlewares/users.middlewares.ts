@@ -2,7 +2,7 @@ import { checkSchema } from 'express-validator'
 import { Request, Response, NextFunction } from 'express'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { validate } from '~/utils/validation'
-import { USERS_MESSAGES } from '~/constants/messages'
+import { ADMINS_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import { capitalize } from 'lodash'
 import { ParamSchema } from 'express-validator'
 import usersService from '~/services/users.services'
@@ -11,9 +11,10 @@ import { hashPassword } from '~/utils/crypto'
 import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { verifyToken } from '~/utils/jwt'
-import { ObjectId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import { TokenPayload } from '~/models/requests/User.requets'
-import { UserVerifyStatus } from '~/constants/enums'
+import { Role, UserVerifyStatus } from '~/constants/enums'
+import User from '~/models/schemas/User.schemas'
 
 const nameSchema: ParamSchema = {
   notEmpty: {
@@ -372,6 +373,15 @@ export const verifiedUserValidator = (req: Request, res: Response, next: NextFun
   const { verify } = req.decoded_authorization as TokenPayload
   if (verify !== UserVerifyStatus.Verified) {
     return next(new ErrorWithStatus({ message: USERS_MESSAGES.USER_NOT_VERIFIED, status: HTTP_STATUS.FORBIDDEN }))
+  }
+  next()
+}
+
+export const userRoleValidator = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const userRole = await databaseService.users.findOne({ _id: new ObjectId(user_id) }, { projection: { role: 1 } })
+  if ((userRole as WithId<User>).role === Role.User) {
+    return next(new ErrorWithStatus({ message: ADMINS_MESSAGES.USER_IS_NOT_ADMIN, status: HTTP_STATUS.FORBIDDEN }))
   }
   next()
 }

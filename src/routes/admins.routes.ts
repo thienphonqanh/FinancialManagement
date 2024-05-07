@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { addCashflowCategoryController, addCashFlowController } from '~/controllers/admins.controllers'
-import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
+import { accessTokenValidator, userRoleValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 const adminsRouter = Router()
@@ -14,6 +14,7 @@ const adminsRouter = Router()
 adminsRouter.post(
   '/add-cashflow',
   accessTokenValidator,
+  userRoleValidator,
   verifiedUserValidator,
   wrapRequestHandler(addCashFlowController)
 )
@@ -27,6 +28,7 @@ adminsRouter.post(
 adminsRouter.post(
   '/add-cashflow-category',
   accessTokenValidator,
+  userRoleValidator,
   verifiedUserValidator,
   wrapRequestHandler(addCashflowCategoryController)
 )

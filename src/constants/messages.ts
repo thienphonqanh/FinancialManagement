@@ -43,5 +43,6 @@ export const USERS_MESSAGES = {
 
 export const ADMINS_MESSAGES = {
   ADD_CASH_FLOW_SUCCESS: 'Thêm dòng tiền thành công',
-  ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công'
+  ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công',
+  USER_IS_NOT_ADMIN: 'Bạn không có quyền này'
 } as const
