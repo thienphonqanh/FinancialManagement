@@ -37,7 +37,8 @@ export const USERS_MESSAGES = {
   INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token',
   RESET_PASSWORD_SUCCESS: 'Reset password success',
   USER_NOT_VERIFIED: 'User not verified',
-  REFRESH_TOKEN_SUCCESS: 'Refresh token success'
+  REFRESH_TOKEN_SUCCESS: 'Refresh token success',
+  GET_ME_SUCCESS: 'Lấy thông tin người dùng thành công'
 } as const
 
 export const ADMINS_MESSAGES = {

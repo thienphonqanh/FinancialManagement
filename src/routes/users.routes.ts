@@ -8,7 +8,8 @@ import {
   verifyForgotPasswordController,
   resetPasswordController,
   refreshTokenController,
-  resendVerifyEmailController
+  resendVerifyEmailController,
+  getMeController
 } from '~/controllers/users.controllers'
 import {
   registerValidator,
@@ -18,7 +19,8 @@ import {
   emailVerifyTokenValidator,
   forgotPasswordValidator,
   verifyForgotPasswordTokenValidator,
-  resetPasswordValidator
+  resetPasswordValidator,
+  verifiedUserValidator
 } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -101,5 +103,14 @@ usersRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(ref
  * Body: {}
  */
 usersRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandler(resendVerifyEmailController))
+
+/**
+ * Description. Get profile of user
+ * Path: /me
+ * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: {}
+ */
+usersRouter.get('/me', accessTokenValidator, verifiedUserValidator, wrapRequestHandler(getMeController))
 
 export default usersRouter
