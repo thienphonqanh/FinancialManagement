@@ -16,8 +16,8 @@ export enum IncludedReport {
 }
 
 export enum Role {
-  Admin, // Quản trị viên, mặc định = 0
-  User // Người dùng
+  User, // Người dùng, mặc định = 0
+  Admin // Quản trị viên
 }
 
 export enum TokenType {

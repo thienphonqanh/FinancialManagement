@@ -70,7 +70,8 @@ class AdminsService {
                   {
                     _id: new ObjectId(),
                     icon: url[0].url,
-                    name: name as string
+                    name: name as string,
+                    isChosen: 0 // Mặc định: không chọn
                   }
                 ]
               ]

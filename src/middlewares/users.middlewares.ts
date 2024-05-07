@@ -12,7 +12,7 @@ import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { verifyToken } from '~/utils/jwt'
 import { ObjectId, WithId } from 'mongodb'
-import { TokenPayload } from '~/models/requests/User.requets'
+import { TokenPayload } from '~/models/requests/User.requests'
 import { Role, UserVerifyStatus } from '~/constants/enums'
 import User from '~/models/schemas/User.schemas'
 

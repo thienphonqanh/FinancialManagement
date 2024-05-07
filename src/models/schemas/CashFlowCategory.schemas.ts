@@ -8,6 +8,8 @@ interface CashFlowCategoryType {
   sub_category?: []
   created_at?: Date
   updated_at?: Date
+  isChosen?: number
+  isExpanded?: number
 }
 
 export default class CashFlowCategory {
@@ -18,6 +20,8 @@ export default class CashFlowCategory {
   sub_category: []
   created_at: Date
   updated_at: Date
+  isChosen: number
+  isExpanded: number
 
   constructor(cashFlowCategoryType: CashFlowCategoryType) {
     const date = new Date()
@@ -28,5 +32,7 @@ export default class CashFlowCategory {
     this.sub_category = cashFlowCategoryType.sub_category || []
     this.created_at = cashFlowCategoryType.created_at || date
     this.updated_at = cashFlowCategoryType.updated_at || date
+    this.isChosen = cashFlowCategoryType.isChosen || 0 // Được chọn -> mặc định = 0 (không chọn)
+    this.isExpanded = cashFlowCategoryType.isExpanded || 1 // Parent category có thể mở rộng -> mặc định = 1 (có thể mở rộng)
   }
 }

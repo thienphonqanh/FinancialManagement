@@ -12,7 +12,7 @@ import {
   TokenPayload,
   VerifyEmailReqBody,
   VerifyForgotPasswordTokenReqBody
-} from '~/models/requests/User.requets'
+} from '~/models/requests/User.requests'
 import User from '~/models/schemas/User.schemas'
 import { ObjectId } from 'mongodb'
 import databaseService from '~/services/database.services'
