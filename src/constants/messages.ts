@@ -46,3 +46,7 @@ export const ADMINS_MESSAGES = {
   ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công',
   USER_IS_NOT_ADMIN: 'Bạn không có quyền này'
 } as const
+
+export const APP_MESSAGES = {
+  GET_CASH_FLOW_SUCCESS: 'Lấy dòng tiền thành công'
+}

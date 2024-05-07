@@ -7,6 +7,7 @@ import { defaultErrorHandler } from './middlewares/errors.middlewares'
 import usersRouter from './routes/users.routes'
 import adminsRouter from './routes/admins.routes'
 import { initFolder } from './utils/file'
+import appRouter from './routes/app.routes'
 config()
 
 const PORT = process.env.PORT
@@ -20,6 +21,7 @@ initFolder()
 app.use(express.json()) // Kích hoạt middleware -> chuyển đổi json trong HTTP thành JS Object
 app.use('/users', usersRouter) // Route cho người dùng
 app.use('/admins', adminsRouter) // Route cho quản trị viên
+app.use('/app', appRouter) // Route cho quản trị viên
 app.use(defaultErrorHandler) // Middleware xử lý lỗi mặc định
 
 httpServer.listen(PORT, () => {
