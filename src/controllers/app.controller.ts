@@ -7,3 +7,8 @@ export const getCashFlowController = async (req: Request, res: Response, next: N
   const data = await appServices.getCashFlow()
   return res.json({ message: APP_MESSAGES.GET_CASH_FLOW_SUCCESS, data: data })
 }
+
+export const getCashFlowCategoryController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await appServices.getCashFlowCategory()
+  return res.json({ message: APP_MESSAGES.GET_CASH_FLOW_SUCCESS, result: result })
+}

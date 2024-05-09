@@ -8,6 +8,7 @@ import { CompleteMultipartUploadCommandOutput } from '@aws-sdk/client-s3'
 import { ADMINS_MESSAGES } from '~/constants/messages'
 import CashFlow from '~/models/schemas/CashFlow.schemas'
 import { Fields, File } from 'formidable'
+import CashFlowSubCategory from '~/models/schemas/CashFlowSubCategory.schemas'
 
 class AdminsService {
   async addCashflow(req: Request) {
@@ -62,34 +63,34 @@ class AdminsService {
     const parent_id = Array.isArray(fields.parent_id) ? fields.parent_id[0] : fields.parent_id
     // Kiểm tra tồn tại của parent_id -> (sub_category)
     if (parent_id !== undefined && parent_id.trim() !== '') {
+      // Thêm mới sub category
+      const cashFlowSubCategory = new CashFlowSubCategory({
+        _id: new ObjectId(),
+        icon: url[0].url,
+        name: name as string,
+        isChosen: 0, // Mặc định: không chọn
+        parent_id: new ObjectId(parent_id as string)
+      })
+      // Thêm vào db
       await databaseService.cashFlowCategories.findOneAndUpdate({ _id: new ObjectId(parent_id as string) }, [
         {
           $set: {
             sub_category: {
-              $concatArrays: [
-                '$sub_category',
-                [
-                  {
-                    _id: new ObjectId(),
-                    icon: url[0].url,
-                    name: name as string,
-                    isChosen: 0 // Mặc định: không chọn
-                  }
-                ]
-              ]
+              $concatArrays: ['$sub_category', [cashFlowSubCategory]]
             }
           }
         }
       ])
       return ADMINS_MESSAGES.ADD_CASH_FLOW_CATEGORY_SUCCESS
     }
-
+    // Thêm mới parent category
     const cashFlowCategory = new CashFlowCategory({
       _id: new ObjectId(),
       icon: url[0].url,
       name: name as string,
       cash_flow_id: new ObjectId(cash_flow_id as string)
     })
+    // Thêm vào db
     await databaseService.cashFlowCategories.insertOne(cashFlowCategory)
     return ADMINS_MESSAGES.ADD_CASH_FLOW_CATEGORY_SUCCESS
   }

@@ -1,9 +1,21 @@
 import { Router } from 'express'
-import { getCashFlowController } from '~/controllers/app.controller'
-import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
+import { getCashFlowController, getCashFlowCategoryController } from '~/controllers/app.controller'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 const appRouter = Router()
-// làm lun cho thống nhất
-appRouter.get('/get-cash-flow', accessTokenValidator, verifiedUserValidator, wrapRequestHandler(getCashFlowController))
+
+/**
+ * Description. Get cash flow
+ * Path: /get-cash-flow
+ * Method: GET
+ */
+appRouter.get('/get-cash-flow', wrapRequestHandler(getCashFlowController))
+
+/**
+ * Description. Get cash flow category
+ * Path: /get-cash-flow-category
+ * Method: GET
+ */
+appRouter.get('/get-cash-flow-category', wrapRequestHandler(getCashFlowCategoryController))
+
 export default appRouter
