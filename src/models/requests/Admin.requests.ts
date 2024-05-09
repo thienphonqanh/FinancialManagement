@@ -1,13 +1,14 @@
 import { ObjectId } from 'mongodb'
+import { File, Fields } from 'formidable'
 
 export interface CashflowReqBody {
-  icon: string
-  name: string
+  icon: File[]
+  name: Fields<string>
 }
 
 export interface CashflowCategoryReqBody {
-  icon: string
-  name: string
+  icon: File[]
+  name: Fields<string>
   cash_flow_id: ObjectId
   sub_category?: []
 }

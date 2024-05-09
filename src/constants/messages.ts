@@ -42,6 +42,11 @@ export const USERS_MESSAGES = {
 } as const
 
 export const ADMINS_MESSAGES = {
+  CASH_FLOW_NAME_IS_REQUIRED: 'Tên dòng tiền không được để trống',
+  CASH_FLOW_NAME_IS_EXIST: 'Tên dòng tiền đã tồn tại',
+  CASH_FLOW_CATEGORY_NAME_IS_REQUIRED: 'Tên hạng mục không được để trống',
+  CASH_FLOW_CATEGORY_NAME_IS_EXIST: 'Tên hạng mục đã tồn tại',
+  CASH_FLOW_CATEGORY_MUST_BELONG_TO_CASH_FLOW: 'Hạng mục phải thuộc về dòng tiền',
   ADD_CASH_FLOW_SUCCESS: 'Thêm dòng tiền thành công',
   ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công',
   USER_IS_NOT_ADMIN: 'Bạn không có quyền này'

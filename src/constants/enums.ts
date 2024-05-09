@@ -11,8 +11,8 @@ export enum GenderType {
 }
 
 export enum IncludedReport {
-  NotIncluded, // Không bao gồm, mặc định = 0
-  Included // Bao gồm
+  Included, // Bao gồm, mặc định = 0
+  NotIncluded // Không bao gồm
 }
 
 export enum Role {

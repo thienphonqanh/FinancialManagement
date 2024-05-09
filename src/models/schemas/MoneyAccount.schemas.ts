@@ -6,10 +6,10 @@ interface MoneyAccountType {
   name: string
   account_balance: Decimal128
   money_account_type: ObjectId[]
-  created_at: Date
+  created_at?: Date
   updated_at?: Date
   description?: string // Optional
-  not_included_report?: IncludedReport // Optional
+  report?: IncludedReport // Optional
   select_bank?: number // Optional
   credit_limit_number?: Decimal128 // Optional
 }
@@ -22,7 +22,7 @@ export default class MoneyAccount {
   created_at: Date
   updated_at: Date
   description: string // Optional
-  not_included_report: IncludedReport // Optional
+  report: IncludedReport // Optional
   select_bank: number // Optional
   credit_limit_number: Decimal128 // Optional
 
@@ -35,7 +35,7 @@ export default class MoneyAccount {
     this.description = moneyAccountType.description || ''
     this.created_at = moneyAccountType.created_at || date
     this.updated_at = moneyAccountType.updated_at || date
-    this.not_included_report = moneyAccountType.not_included_report || IncludedReport.NotIncluded
+    this.report = moneyAccountType.report || IncludedReport.Included
     this.select_bank = moneyAccountType.select_bank || 0
     this.credit_limit_number = moneyAccountType.credit_limit_number || new Decimal128('0')
   }
