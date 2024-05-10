@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-interface CashFlowSubCategoryType {
+export interface CashFlowSubCategoryType {
   _id: ObjectId
   icon: string
   name: string
