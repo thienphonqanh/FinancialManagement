@@ -64,6 +64,8 @@ export const ADMINS_MESSAGES = {
 
 export const APP_MESSAGES = {
   GET_CASH_FLOW_SUCCESS: 'Lấy dòng tiền thành công',
+  GET_MONEY_ACCOUNT_SUCCESS: 'Lấy tài khoản tiền thành công',
+  GET_MONEY_ACCOUNT_TYPE_SUCCESS: 'Lấy loại tài khoản tiền thành công',
   USER_ID_IS_REQUIRED: 'ID người dùng là bắt buộc',
   USER_ID_MUST_BE_A_STRING: 'ID người dùng phải là chuỗi',
   CREDIT_LIMIT_NUMBER_MUST_BE_A_NUMBER: 'Số dư tài khoản phải là số',

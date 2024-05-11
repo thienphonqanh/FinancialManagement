@@ -1,8 +1,12 @@
 import { checkSchema } from 'express-validator'
-import { ObjectId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import { APP_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
+import { wrapRequestHandler } from '~/utils/handlers'
 import { validate } from '~/utils/validation'
+import { Request, Response, NextFunction } from 'express'
+import { TokenPayload } from '~/models/requests/User.requests'
+import User from '~/models/schemas/User.schemas'
 
 // Validator cho thêm mới tài khoản tiền
 export const moneyAccountValidator = validate(

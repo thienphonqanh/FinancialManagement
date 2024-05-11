@@ -2,7 +2,9 @@ import { Router } from 'express'
 import {
   getCashFlowController,
   getCashFlowCategoryController,
-  addMoneyAccountController
+  addMoneyAccountController,
+  getMoneyAccountTypeController,
+  getMoneyAccountController
 } from '~/controllers/app.controller'
 import { moneyAccountValidator } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
@@ -23,6 +25,25 @@ appsRouter.get('/get-cash-flow', wrapRequestHandler(getCashFlowController))
  * Method: GET
  */
 appsRouter.get('/get-cash-flow-category', wrapRequestHandler(getCashFlowCategoryController))
+
+/**
+ * Description. Get money account type
+ * Path: /get-money-account-type
+ * Method: GET
+ */
+appsRouter.get('/get-money-account-type', wrapRequestHandler(getMoneyAccountTypeController))
+
+/**
+ * Description. Get money account of user
+ * Path: /get-money-account
+ * Method: GET
+ */
+appsRouter.get(
+  '/get-money-account',
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(getMoneyAccountController)
+)
 
 /**
  * Description. Add new money acccount

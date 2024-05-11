@@ -1,4 +1,4 @@
-import { Decimal128 } from 'mongodb'
+import { Decimal128, ObjectId } from 'mongodb'
 import databaseService from './database.services'
 import { config } from 'dotenv'
 import CashFlowCategory, { CashFlowCategoryType } from '~/models/schemas/CashFlowCategory.schemas'
@@ -17,6 +17,11 @@ class AppServices {
   async getCashFlow() {
     const data = await databaseService.cashFlows.find({}).toArray()
     return data
+  }
+
+  async getMoneyAccountType() {
+    const result = await databaseService.moneyAccountTypes.find({}).toArray()
+    return result
   }
 
   async getCashFlowCategory() {
@@ -76,11 +81,18 @@ class AppServices {
   async addMoneyAccount(payload: MoneyAccountReqBody) {
     const moneyAccount = new MoneyAccount({
       ...payload,
+      user_id: new ObjectId(payload.user_id),
       account_balance: new Decimal128(payload.account_balance),
       credit_limit_number: new Decimal128(payload.credit_limit_number || '0')
     })
     await databaseService.moneyAccounts.insertOne(moneyAccount)
     return APP_MESSAGES.ADD_MONEY_ACCOUNT_SUCCESS
+  }
+
+  // Thêm mới loại tài khoản tiền (tiền mặt, ngân hàng, ...)
+  async getMoneyAccount(user_id: string) {
+    const result = await databaseService.moneyAccounts.find({ user_id: new ObjectId(user_id) }).toArray()
+    return result
   }
 }
 
