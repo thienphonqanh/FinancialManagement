@@ -5,7 +5,8 @@ interface MoneyAccountType {
   _id?: ObjectId
   name: string
   account_balance: Decimal128
-  money_account_type: ObjectId[]
+  user_id: ObjectId
+  money_account_type_id: ObjectId
   created_at?: Date
   updated_at?: Date
   description?: string // Optional
@@ -18,7 +19,8 @@ export default class MoneyAccount {
   _id?: ObjectId
   name: string
   account_balance: Decimal128
-  money_account_type: ObjectId[]
+  user_id: ObjectId
+  money_account_type_id: ObjectId
   created_at: Date
   updated_at: Date
   description: string // Optional
@@ -31,7 +33,8 @@ export default class MoneyAccount {
     this._id = moneyAccountType._id || new ObjectId()
     this.name = moneyAccountType.name
     this.account_balance = moneyAccountType.account_balance
-    this.money_account_type = moneyAccountType.money_account_type || []
+    this.user_id = moneyAccountType.user_id || ''
+    this.money_account_type_id = moneyAccountType.money_account_type_id || ''
     this.description = moneyAccountType.description || ''
     this.created_at = moneyAccountType.created_at || date
     this.updated_at = moneyAccountType.updated_at || date

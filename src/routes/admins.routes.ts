@@ -1,9 +1,15 @@
 import { Router } from 'express'
-import { addCashflowCategoryController, addCashFlowController } from '~/controllers/admins.controllers'
-import { cashFlowCategoryValidator, cashFlowValidator } from '~/middlewares/admins.middlewares'
+import {
+  addCashflowCategoryController,
+  addCashFlowController,
+  addMoneyAccountTypeController
+} from '~/controllers/admins.controllers'
+import {
+  cashFlowCategoryValidator,
+  cashFlowValidator,
+  moneyAccountTypeValidator
+} from '~/middlewares/admins.middlewares'
 import { accessTokenValidator, userRoleValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
-import CashFlow from '~/models/schemas/CashFlow.schemas'
-import databaseService from '~/services/database.services'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 const adminsRouter = Router()
@@ -37,4 +43,20 @@ adminsRouter.post(
   cashFlowCategoryValidator,
   wrapRequestHandler(addCashflowCategoryController)
 )
+
+/**
+ * Description. Add new money acccount type
+ * Path: /add-money-acccount-type
+ * Method: POST
+ * Body: { image: string, name: string }
+ */
+adminsRouter.post(
+  '/add-money-account-type',
+  accessTokenValidator,
+  userRoleValidator,
+  verifiedUserValidator,
+  moneyAccountTypeValidator,
+  wrapRequestHandler(addMoneyAccountTypeController)
+)
+
 export default adminsRouter

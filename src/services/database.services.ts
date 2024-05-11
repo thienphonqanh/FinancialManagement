@@ -5,6 +5,7 @@ import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import CashFlow from '~/models/schemas/CashFlow.schemas'
 import CashFlowCategory from '~/models/schemas/CashFlowCategory.schemas'
 import RefreshToken from '~/models/schemas/Refresh.schemas'
+import MoneyAccountType from '~/models/schemas/MoneyAccountType.schemas'
 
 config()
 
@@ -36,6 +37,10 @@ class DatabaseService {
 
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
+  }
+
+  get moneyAccountTypes(): Collection<MoneyAccountType> {
+    return this.db.collection(process.env.DB_MONEY_ACCOUNT_TYPES_COLLECTION as string)
   }
 
   get moneyAccounts(): Collection<MoneyAccount> {

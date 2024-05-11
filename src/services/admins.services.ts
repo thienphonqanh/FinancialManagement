@@ -9,8 +9,10 @@ import { ADMINS_MESSAGES } from '~/constants/messages'
 import CashFlow from '~/models/schemas/CashFlow.schemas'
 import { Fields, File } from 'formidable'
 import CashFlowSubCategory from '~/models/schemas/CashFlowSubCategory.schemas'
-
+import MoneyAccountType from '~/models/schemas/MoneyAccountType.schemas'
+import { MoneyAccountTypeReqBody } from '~/models/requests/Admin.requests'
 class AdminsService {
+  // Thêm mới dòng tiền
   async addCashflow(req: Request) {
     const files = req.body.files as File[]
     const fields = req.body.fields as Fields<string>
@@ -31,7 +33,6 @@ class AdminsService {
     // Lấy data từ fields đã parse từ form-data
     const name = Array.isArray(fields.name) ? fields.name[0] : fields.name
     const cashFlow = new CashFlow({
-      _id: new ObjectId(),
       icon: url[0].url,
       name: name as string
     })
@@ -40,6 +41,7 @@ class AdminsService {
     return ADMINS_MESSAGES.ADD_CASH_FLOW_SUCCESS
   }
 
+  // Thêm mới hạng mục theo dòng tiền
   async addCashflowCategory(req: Request) {
     const files = req.body.files as File[]
     const fields = req.body.fields as Fields<string>
@@ -65,7 +67,6 @@ class AdminsService {
     if (parent_id !== undefined && parent_id.trim() !== '') {
       // Thêm mới sub category
       const cashFlowSubCategory = new CashFlowSubCategory({
-        _id: new ObjectId(),
         icon: url[0].url,
         name: name as string,
         isChosen: 0, // Mặc định: không chọn
@@ -85,7 +86,6 @@ class AdminsService {
     }
     // Thêm mới parent category
     const cashFlowCategory = new CashFlowCategory({
-      _id: new ObjectId(),
       icon: url[0].url,
       name: name as string,
       cash_flow_id: new ObjectId(cash_flow_id as string)
@@ -93,6 +93,17 @@ class AdminsService {
     // Thêm vào db
     await databaseService.cashFlowCategories.insertOne(cashFlowCategory)
     return ADMINS_MESSAGES.ADD_CASH_FLOW_CATEGORY_SUCCESS
+  }
+
+  // Thêm mới loại tài khoản tiền (tiền mặt, ngân hàng, ...)
+  async addMoneyAccountType(payload: MoneyAccountTypeReqBody) {
+    const moneyAccountType = new MoneyAccountType({
+      icon: payload.image,
+      name: payload.name
+    })
+
+    await databaseService.moneyAccountTypes.insertOne(moneyAccountType)
+    return ADMINS_MESSAGES.ADD_MONEY_ACCOUNT_TYPE_SUCCESS
   }
 }
 

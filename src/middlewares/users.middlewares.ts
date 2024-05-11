@@ -15,6 +15,7 @@ import { ObjectId, WithId } from 'mongodb'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { Role, UserVerifyStatus } from '~/constants/enums'
 import User from '~/models/schemas/User.schemas'
+import { wrapRequestHandler } from '~/utils/handlers'
 
 const nameSchema: ParamSchema = {
   notEmpty: {
@@ -377,11 +378,11 @@ export const verifiedUserValidator = (req: Request, res: Response, next: NextFun
   next()
 }
 
-export const userRoleValidator = async (req: Request, res: Response, next: NextFunction) => {
+export const userRoleValidator = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const userRole = await databaseService.users.findOne({ _id: new ObjectId(user_id) }, { projection: { role: 1 } })
   if ((userRole as WithId<User>).role === Role.User) {
     return next(new ErrorWithStatus({ message: ADMINS_MESSAGES.USER_IS_NOT_ADMIN, status: HTTP_STATUS.FORBIDDEN }))
   }
   next()
-}
+})

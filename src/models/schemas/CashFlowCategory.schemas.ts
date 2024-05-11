@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 
 export interface CashFlowCategoryType {
-  _id: ObjectId
+  _id?: ObjectId
   icon: string
   name: string
   cash_flow_id: ObjectId
@@ -25,7 +25,7 @@ export default class CashFlowCategory {
 
   constructor(cashFlowCategoryType: CashFlowCategoryType) {
     const date = new Date()
-    this._id = cashFlowCategoryType._id
+    this._id = cashFlowCategoryType._id || new ObjectId()
     this.icon = cashFlowCategoryType.icon
     this.name = cashFlowCategoryType.name
     this.cash_flow_id = cashFlowCategoryType.cash_flow_id

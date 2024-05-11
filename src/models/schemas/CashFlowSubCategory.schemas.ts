@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 
 export interface CashFlowSubCategoryType {
-  _id: ObjectId
+  _id?: ObjectId
   icon: string
   name: string
   isChosen?: number
@@ -16,7 +16,7 @@ export default class CashFlowSubCategory {
   parent_id: ObjectId
 
   constructor(cashFlowSubCategoryType: CashFlowSubCategoryType) {
-    this._id = cashFlowSubCategoryType._id
+    this._id = cashFlowSubCategoryType._id || new ObjectId()
     this.icon = cashFlowSubCategoryType.icon
     this.name = cashFlowSubCategoryType.name
     this.isChosen = cashFlowSubCategoryType.isChosen || 0 // Được chọn -> mặc định = 0 (không chọn)

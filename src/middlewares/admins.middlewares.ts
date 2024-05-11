@@ -1,4 +1,4 @@
-import { ADMINS_MESSAGES } from '~/constants/messages'
+import { ADMINS_MESSAGES, APP_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
 import { getFields, handleUploadImage } from '~/utils/file'
 import { Request, Response, NextFunction } from 'express'
@@ -6,6 +6,9 @@ import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { wrapRequestHandler } from '~/utils/handlers'
 import fsPromise from 'fs/promises'
+import { validate } from '~/utils/validation'
+import { checkSchema } from 'express-validator'
+import { ObjectId } from 'mongodb'
 
 // Muốn sử dụng async await trong handler express thì phải có try catch
 // Nếu không dùng try catch thì phải dùng wrapRequestHandler
@@ -41,6 +44,7 @@ const cashFlowAndCategoryValidator = (collection: string) =>
     }
     // Đối với CashFlowCategory
     if (collection === 'CashFlowCategory') {
+      // Kiểm tra tồn tại của cash_flow_id và parent_id
       if (
         (cashFlowIdValue === undefined || cashFlowIdValue.trim() === '') &&
         (parentIdValue === undefined || parentIdValue.trim() === '')
@@ -55,6 +59,39 @@ const cashFlowAndCategoryValidator = (collection: string) =>
             status: HTTP_STATUS.UNPROCESSABLE_ENTITY
           })
         )
+      } else {
+        // Kiểm tra hợp lệ của cash_flow_id
+        if (cashFlowIdValue !== undefined && cashFlowIdValue.trim() !== '') {
+          const isExist = await databaseService.cashFlows.findOne({ _id: new ObjectId(cashFlowIdValue) })
+          if (isExist === null) {
+            // Xoá file đã upload
+            files.forEach((file) => {
+              fsPromise.unlink(file.filepath)
+            })
+            return next(
+              new ErrorWithStatus({
+                message: ADMINS_MESSAGES.CASH_FLOW_NOT_FOUND,
+                status: HTTP_STATUS.UNPROCESSABLE_ENTITY
+              })
+            )
+          }
+        }
+        // Kiểm tra hợp lệ của parent_id
+        if (parentIdValue !== undefined && parentIdValue.trim() !== '') {
+          const isExist = await databaseService.cashFlowCategories.findOne({ _id: new ObjectId(parentIdValue) })
+          if (isExist === null) {
+            // Xoá file đã upload
+            files.forEach((file) => {
+              fsPromise.unlink(file.filepath)
+            })
+            return next(
+              new ErrorWithStatus({
+                message: ADMINS_MESSAGES.CASH_FLOW_PARENT_CATEGORY_NOT_FOUND,
+                status: HTTP_STATUS.UNPROCESSABLE_ENTITY
+              })
+            )
+          }
+        }
       }
     }
     const isExist =
@@ -89,3 +126,48 @@ const cashFlowAndCategoryValidator = (collection: string) =>
 export const cashFlowValidator = cashFlowAndCategoryValidator('CashFlow')
 // Validator cho thêm hạng mục (addCashFlowCategory)
 export const cashFlowCategoryValidator = cashFlowAndCategoryValidator('CashFlowCategory')
+
+// Validator cho thêm loại tài khoản tiền
+export const moneyAccountTypeValidator = validate(
+  checkSchema(
+    {
+      image: {
+        notEmpty: {
+          errorMessage: ADMINS_MESSAGES.MONEY_ACCOUNT_TYPE_ICON_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: ADMINS_MESSAGES.MONEY_ACCOUNT_TYPE_ICON_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value) => {
+            const isExist = await databaseService.moneyAccountTypes.findOne({ icon: value })
+            if (isExist !== null) {
+              throw new Error(ADMINS_MESSAGES.MONEY_ACCOUNT_TYPE_ICON_IS_EXIST)
+            }
+            return true
+          }
+        }
+      },
+      name: {
+        notEmpty: {
+          errorMessage: ADMINS_MESSAGES.MONEY_ACCOUNT_TYPE_NAME_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: ADMINS_MESSAGES.MONEY_ACCOUNT_TYPE_NAME_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value) => {
+            const isExist = await databaseService.moneyAccountTypes.findOne({ name: value })
+            if (isExist !== null) {
+              throw new Error(ADMINS_MESSAGES.MONEY_ACCOUNT_TYPE_NAME_IS_EXIST)
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)

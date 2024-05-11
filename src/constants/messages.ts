@@ -27,7 +27,7 @@ export const USERS_MESSAGES = {
   USED_REFRESH_TOKEN_OR_NOT_EXIST: 'Used refresh token or not exist',
   LOGOUT_SUCCESS: 'Logout success',
   EMAIL_VERIFY_TOKEN_IS_REQUIRED: 'Email verify token is required',
-  USER_NOT_FOUND: 'User not found',
+  USER_NOT_FOUND: 'Người dùng không hợp lệ',
   EMAIL_ALREADY_VERIFIED_BEFORE: 'Email already verified before',
   EMAIL_VERIFY_SUCCESS: 'Email verify success',
   RESEND_VERIFY_EMAIL_SUCCESS: 'Resend verify email success',
@@ -47,11 +47,35 @@ export const ADMINS_MESSAGES = {
   CASH_FLOW_CATEGORY_NAME_IS_REQUIRED: 'Tên hạng mục không được để trống',
   CASH_FLOW_CATEGORY_NAME_IS_EXIST: 'Tên hạng mục đã tồn tại',
   CASH_FLOW_CATEGORY_MUST_BELONG_TO_CASH_FLOW: 'Hạng mục phải thuộc về dòng tiền',
+  CASH_FLOW_NOT_FOUND: 'Không tìm thấy dòng tiền',
+  CASH_FLOW_PARENT_CATEGORY_NOT_FOUND: 'Không tìm thấy hạng mục cha',
   ADD_CASH_FLOW_SUCCESS: 'Thêm dòng tiền thành công',
   ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công',
-  USER_IS_NOT_ADMIN: 'Bạn không có quyền này'
+  USER_IS_NOT_ADMIN: 'Bạn không có quyền này',
+  MONEY_ACCOUNT_TYPE_ICON_IS_REQUIRED: 'Ảnh loại tài khoản không được để trống',
+  MONEY_ACCOUNT_TYPE_ICON_MUST_BE_A_STRING: 'Ảnh loại tài khoản phải là chuỗi',
+  MONEY_ACCOUNT_TYPE_ICON_IS_EXIST: 'Ảnh loại tài khoản đã tồn tại',
+  MONEY_ACCOUNT_TYPE_NAME_IS_REQUIRED: 'Tên loại tài khoản được để trống',
+  MONEY_ACCOUNT_TYPE_NAME_MUST_BE_A_STRING: 'Tên loại tài khoản phải là chuỗi',
+  MONEY_ACCOUNT_TYPE_NAME_IS_EXIST: 'Tên loại tài khoản đã tồn tại',
+
+  ADD_MONEY_ACCOUNT_TYPE_SUCCESS: 'Thêm loại tài khoản thành công'
 } as const
 
 export const APP_MESSAGES = {
-  GET_CASH_FLOW_SUCCESS: 'Lấy dòng tiền thành công'
-}
+  GET_CASH_FLOW_SUCCESS: 'Lấy dòng tiền thành công',
+  USER_ID_IS_REQUIRED: 'ID người dùng là bắt buộc',
+  USER_ID_MUST_BE_A_STRING: 'ID người dùng phải là chuỗi',
+  CREDIT_LIMIT_NUMBER_MUST_BE_A_NUMBER: 'Số dư tài khoản phải là số',
+  CREDIT_LIMIT_NUMBER_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0: 'Số dư tài khoản phải lớn hơn hoặc bằng 0',
+  ACCOUNT_BALANCE_MUST_IS_REQUIRED: 'Số dư tài khoản là bắt buộc',
+  ACCOUNT_BALANCE_MUST_BE_A_NUMBER: 'Số dư tài khoản phải là số',
+  ACCOUNT_BALANCE_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0: 'Số dư tài khoản phải lớn hơn hoặc bằng 0',
+  MONEY_ACCOUNT_NAME_IS_EXIST: 'Tên tài khoản đã tồn tại',
+  MONEY_ACCOUNT_MUST_BELONG_TO_MONEY_ACCOUNT_TYPE: 'Phải có loại tài khoản đối với một tài khoản tiền',
+  ADD_MONEY_ACCOUNT_SUCCESS: 'Thêm tài khoản tiền thành công',
+  MONEY_ACCOUNT_NAME_IS_REQUIRED: 'Tên tài khoản được để trống',
+  MONEY_ACCOUNT_NAME_MUST_BE_A_STRING: 'Tên tài khoản phải là chuỗi',
+  MONEY_ACCOUNT_TYPE_ID_MUST_BE_A_STRING: 'Loại tài khoản phải là chuỗi',
+  MONEY_ACCOUNT_TYPE_NOT_FOUND: 'Loại tài khoản không hợp lệ'
+} as const

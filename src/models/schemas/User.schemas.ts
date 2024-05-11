@@ -22,7 +22,7 @@ interface UserType {
 }
 
 export default class User {
-  _id: ObjectId
+  _id?: ObjectId
   name: string
   avatar: string
   email: string
