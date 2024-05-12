@@ -2,11 +2,8 @@ import { checkSchema } from 'express-validator'
 import { ObjectId, WithId } from 'mongodb'
 import { APP_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
-import { wrapRequestHandler } from '~/utils/handlers'
 import { validate } from '~/utils/validation'
-import { Request, Response, NextFunction } from 'express'
-import { TokenPayload } from '~/models/requests/User.requests'
-import User from '~/models/schemas/User.schemas'
+import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 
 // Validator cho thêm mới tài khoản tiền
 export const moneyAccountValidator = validate(
@@ -73,12 +70,29 @@ export const moneyAccountValidator = validate(
         },
         trim: true,
         custom: {
-          options: async (value: string) => {
-            const isExist = await databaseService.moneyAccountTypes.findOne({ _id: new ObjectId(value) })
-            if (isExist === null) {
+          options: async (value: string, { req }) => {
+            // Kiểm tra xem id loại tài khoản có hợp lệ không
+            const isValid = await databaseService.moneyAccountTypes.findOne({ _id: new ObjectId(value) })
+            if (isValid === null) {
               throw new Error(APP_MESSAGES.MONEY_ACCOUNT_TYPE_NOT_FOUND)
             }
-            return true
+            if (isValid.name === 'Thẻ tín dụng') {
+              if (req.body.credit_limit_number === undefined) {
+                throw new Error(APP_MESSAGES.CREDIT_LIMIT_NUMBER_IS_REQUIRED)
+              }
+            }
+            const user_id = req.body.user_id as string
+            // Kiểm tra tài khoản đã tồn tại chưa (1 acc chỉ có các loại tài khoản tiền khác nhau)
+            const user = await databaseService.moneyAccounts.findOne(
+              { user_id: new ObjectId(user_id) },
+              { projection: { money_account_type_id: 1 } }
+            )
+            if (user === null) {
+              return true
+            }
+            if ((user as WithId<MoneyAccount>).money_account_type_id.toString() === value) {
+              throw new Error(APP_MESSAGES.MONEY_ACCOUNT_IS_EXIST)
+            }
           }
         }
       },
@@ -89,8 +103,8 @@ export const moneyAccountValidator = validate(
         },
         custom: {
           options: async (value) => {
-            if (value < 0) {
-              throw new Error(APP_MESSAGES.CREDIT_LIMIT_NUMBER_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0)
+            if (value <= 0) {
+              throw new Error(APP_MESSAGES.CREDIT_LIMIT_NUMBER_MUST_BE_GREATER_THAN_0)
             }
             return true
           }

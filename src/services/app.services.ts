@@ -82,6 +82,7 @@ class AppServices {
     const moneyAccount = new MoneyAccount({
       ...payload,
       user_id: new ObjectId(payload.user_id),
+      money_account_type_id: new ObjectId(payload.money_account_type_id),
       account_balance: new Decimal128(payload.account_balance),
       credit_limit_number: new Decimal128(payload.credit_limit_number || '0')
     })

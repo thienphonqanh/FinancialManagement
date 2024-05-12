@@ -51,7 +51,7 @@ appsRouter.get(
  * Method: POST
  * Body: {
  *  name: string, account_balance: number (Decimal128),
- *  money_account_type: string (ObjectId),
+ *  money_account_type_id: string (ObjectId), user_id: string (ObjectId),
  * (Optional)
  *  description: string, report: number (enum IncludedReport),
  *  select_bank: number, credit_limit_number: number (Decimal128)
