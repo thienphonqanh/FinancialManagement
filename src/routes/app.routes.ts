@@ -37,6 +37,7 @@ appsRouter.get('/get-money-account-type', wrapRequestHandler(getMoneyAccountType
  * Description. Get money account of user
  * Path: /get-money-account
  * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
  */
 appsRouter.get(
   '/get-money-account',
@@ -49,6 +50,7 @@ appsRouter.get(
  * Description. Add new money acccount
  * Path: /add-money-acccount
  * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
  * Body: {
  *  name: string, account_balance: number (Decimal128),
  *  money_account_type_id: string (ObjectId), user_id: string (ObjectId),

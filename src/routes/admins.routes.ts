@@ -18,6 +18,7 @@ const adminsRouter = Router()
  * Description. Add new cash flow
  * Path: /add-cash-flow
  * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
  * Body: { image: file, name: string }
  */
 adminsRouter.post(
@@ -33,6 +34,7 @@ adminsRouter.post(
  * Description. Add new cash flow category
  * Path: /add-cash-flow-category
  * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
  * Body: { image: file, name: string, cashflow_id: string, parent_id: string (sub_category) }
  */
 adminsRouter.post(
@@ -48,6 +50,7 @@ adminsRouter.post(
  * Description. Add new money acccount type
  * Path: /add-money-acccount-type
  * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
  * Body: { image: string, name: string }
  */
 adminsRouter.post(
