@@ -6,6 +6,7 @@ import CashFlow from '~/models/schemas/CashFlow.schemas'
 import CashFlowCategory from '~/models/schemas/CashFlowCategory.schemas'
 import RefreshToken from '~/models/schemas/Refresh.schemas'
 import MoneyAccountType from '~/models/schemas/MoneyAccountType.schemas'
+import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 
 config()
 
@@ -53,6 +54,10 @@ class DatabaseService {
 
   get cashFlowCategories(): Collection<CashFlowCategory> {
     return this.db.collection(process.env.DB_CASH_FLOW_CATEGORIES_COLLECTION as string)
+  }
+
+  get expenseRecords(): Collection<ExpenseRecord> {
+    return this.db.collection(process.env.DB_EXPENSE_RECORDS_COLLECTION as string)
   }
 }
 
