@@ -5,7 +5,8 @@ import CashFlowCategory, { CashFlowCategoryType } from '~/models/schemas/CashFlo
 import CashFlowSubCategory, { CashFlowSubCategoryType } from '~/models/schemas/CashFlowSubCategory.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { APP_MESSAGES } from '~/constants/messages'
-import { MoneyAccountReqBody } from '~/models/requests/Admin.requests'
+import { ExpenseRecordReqBody, MoneyAccountReqBody } from '~/models/requests/Admin.requests'
+import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 
 config()
 
@@ -79,6 +80,9 @@ class AppServices {
 
   // Thêm mới loại tài khoản tiền (tiền mặt, ngân hàng, ...)
   async addMoneyAccount(payload: MoneyAccountReqBody) {
+    if (payload.report !== undefined && (payload.report.toString() === '0' || payload.report.toString() === '1')) {
+      payload.report = parseInt(payload.report.toString())
+    }
     const moneyAccount = new MoneyAccount({
       ...payload,
       user_id: new ObjectId(payload.user_id),
@@ -90,10 +94,27 @@ class AppServices {
     return APP_MESSAGES.ADD_MONEY_ACCOUNT_SUCCESS
   }
 
-  // Thêm mới loại tài khoản tiền (tiền mặt, ngân hàng, ...)
+  // Lấy danh sách các tài khoản tiền của người dùng
   async getMoneyAccount(user_id: string) {
     const result = await databaseService.moneyAccounts.find({ user_id: new ObjectId(user_id) }).toArray()
     return result
+  }
+
+  // Thêm mới bản ghi chi tiêu
+  async addExpenseRecord(payload: ExpenseRecordReqBody) {
+    if (payload.report !== undefined && (payload.report.toString() === '0' || payload.report.toString() === '1')) {
+      payload.report = parseInt(payload.report.toString())
+    }
+    const expenseRecord = new ExpenseRecord({
+      ...payload,
+      amount_of_money: new Decimal128(payload.amount_of_money),
+      cash_flow_category_id: new ObjectId(payload.cash_flow_category_id),
+      money_account_id: new ObjectId(payload.money_account_id),
+      user_id: new ObjectId(payload.user_id),
+      cost_incurred: new Decimal128(payload.cost_incurred || '0') // Add this line to convert cost_incurred to Decimal128
+    })
+    await databaseService.expenseRecords.insertOne(expenseRecord)
+    return APP_MESSAGES.ADD_EXPENSE_RECORD_SUCCESS
   }
 }
 

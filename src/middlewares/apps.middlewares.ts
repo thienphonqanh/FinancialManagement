@@ -109,6 +109,81 @@ export const moneyAccountValidator = validate(
             return true
           }
         }
+      },
+      report: {
+        optional: true,
+        isNumeric: {
+          errorMessage: APP_MESSAGES.REPORT_MUST_BE_A_NUMBER
+        },
+        custom: {
+          options: (value) => {
+            // Kiểm tra nằm ngoài 0 và 1
+            if (value < 0 || value > 1) {
+              throw new Error(APP_MESSAGES.REPORT_MUST_BE_0_OR_1)
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+export const expenseRecordValidator = validate(
+  checkSchema(
+    {
+      amount_of_money: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.EXPENSE_RECORD_AMOUNT_OF_MONEY_IS_REQUIRED
+        },
+        isNumeric: {
+          errorMessage: APP_MESSAGES.EXPENSE_RECORD_AMOUNT_OF_MONEY_MUST_BE_A_NUMBER
+        },
+        custom: {
+          options: async (value) => {
+            if (value < 0) {
+              throw new Error(APP_MESSAGES.EXPENSE_RECORD_AMOUNT_OF_MONEY_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0)
+            }
+            return true
+          }
+        }
+      },
+      cash_flow_category_id: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            // Kiểm tra xem id hạng mục có hợp lệ không
+            const isValid = await databaseService.cashFlowCategories.findOne({ _id: new ObjectId(value) })
+            if (isValid === null) {
+              throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+            }
+          }
+        }
+      },
+      money_account_id: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            // Kiểm tra xem id tài khoản tiền có hợp lệ không
+            const isValid = await databaseService.moneyAccounts.findOne({ _id: new ObjectId(value) })
+            if (isValid === null) {
+              throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
+            }
+          }
+        }
       }
     },
     ['body']

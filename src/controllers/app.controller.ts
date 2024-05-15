@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { APP_MESSAGES } from '~/constants/messages'
-import { MoneyAccountReqBody } from '~/models/requests/Admin.requests'
+import { ExpenseRecordReqBody, MoneyAccountReqBody } from '~/models/requests/Admin.requests'
 import appServices from '~/services/app.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '~/models/requests/User.requests'
@@ -32,5 +32,14 @@ export const addMoneyAccountController = async (
   next: NextFunction
 ) => {
   const result = await appServices.addMoneyAccount(req.body)
+  return res.json({ result })
+}
+
+export const addExpenseRecordController = async (
+  req: Request<ParamsDictionary, any, ExpenseRecordReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const result = await appServices.addExpenseRecord(req.body)
   return res.json({ result })
 }

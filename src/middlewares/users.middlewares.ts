@@ -162,6 +162,11 @@ export const accessTokenValidator = validate(
               })
 
               if (req) {
+                /* 
+                  req.decoded_authorization -> decoded_authorization: biến tự định nghĩa
+                  Gán giá trị cho biến tự định nghĩa này bằng decoded_authorization (từ header)
+                  Gán để sử dụng ở các middleware, controller khác
+                */
                 ;(req as Request).decoded_authorization = decoded_authorization
                 return true
               }

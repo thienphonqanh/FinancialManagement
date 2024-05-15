@@ -71,6 +71,8 @@ export const APP_MESSAGES = {
   CREDIT_LIMIT_NUMBER_IS_REQUIRED: 'Hạn mức tín dụng là bắt buộc',
   CREDIT_LIMIT_NUMBER_MUST_BE_A_NUMBER: 'Hạn mức tín dụng phải là số',
   CREDIT_LIMIT_NUMBER_MUST_BE_GREATER_THAN_0: 'Hạn mức tín dụng phải lớn hơn 0',
+  REPORT_MUST_BE_A_NUMBER: 'Bao gồm báo cáo phải là số',
+  REPORT_MUST_BE_0_OR_1: 'Bao gồm báo cáo phải là 0 hoặc 1',
   ACCOUNT_BALANCE_MUST_IS_REQUIRED: 'Số dư tài khoản là bắt buộc',
   ACCOUNT_BALANCE_MUST_BE_A_NUMBER: 'Số dư tài khoản phải là số',
   ACCOUNT_BALANCE_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0: 'Số dư tài khoản phải lớn hơn hoặc bằng 0',
@@ -81,5 +83,15 @@ export const APP_MESSAGES = {
   MONEY_ACCOUNT_NAME_IS_REQUIRED: 'Tên tài khoản được để trống',
   MONEY_ACCOUNT_NAME_MUST_BE_A_STRING: 'Tên tài khoản phải là chuỗi',
   MONEY_ACCOUNT_TYPE_ID_MUST_BE_A_STRING: 'Loại tài khoản phải là chuỗi',
-  MONEY_ACCOUNT_TYPE_NOT_FOUND: 'Loại tài khoản không hợp lệ'
+  MONEY_ACCOUNT_TYPE_NOT_FOUND: 'Loại tài khoản không hợp lệ',
+  EXPENSE_RECORD_AMOUNT_OF_MONEY_IS_REQUIRED: 'Số tiền ghi chép là bắt buộc',
+  EXPENSE_RECORD_AMOUNT_OF_MONEY_MUST_BE_A_NUMBER: 'Số tiền ghi chép phải là số',
+  EXPENSE_RECORD_AMOUNT_OF_MONEY_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0: 'Số tiền ghi chép phải lớn hơn hoặc bằng 0',
+  CASH_FLOW_CATEGORY_ID_IS_REQUIRED: 'Hạng mục của dòng tiền là bắt buộc',
+  CASH_FLOW_CATEGORY_ID_MUST_BE_A_STRING: 'Hạng mục của dòng tiền phải là chuỗi',
+  CASH_FLOW_CATEGORY_NOT_FOUND: 'Hạng mục của dòng tiền không hợp lệ',
+  MONEY_ACCOUNT_ID_IS_REQUIRED: 'Tài khoản tiền là bắt buộc',
+  MONEY_ACCOUNT_ID_MUST_BE_A_STRING: 'Tài khoản tiền phải là chuỗi',
+  MONEY_ACCOUNT_NOT_FOUND: 'Tài khoản tiền phải là chuỗi',
+  ADD_EXPENSE_RECORD_SUCCESS: 'Thêm mới bản ghi chi tiêu thành công'
 } as const

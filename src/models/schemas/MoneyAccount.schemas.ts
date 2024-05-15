@@ -11,7 +11,7 @@ interface MoneyAccountType {
   updated_at?: Date
   description?: string // Optional
   report?: IncludedReport // Optional
-  select_bank?: number // Optional
+  select_bank?: string // Optional
   credit_limit_number?: Decimal128 // Optional
 }
 
@@ -25,7 +25,7 @@ export default class MoneyAccount {
   updated_at: Date
   description: string // Optional
   report: IncludedReport // Optional
-  select_bank: number // Optional
+  select_bank: string // Optional
   credit_limit_number: Decimal128 // Optional
 
   constructor(moneyAccountType: MoneyAccountType) {
@@ -39,7 +39,7 @@ export default class MoneyAccount {
     this.created_at = moneyAccountType.created_at || date
     this.updated_at = moneyAccountType.updated_at || date
     this.report = moneyAccountType.report || IncludedReport.Included
-    this.select_bank = moneyAccountType.select_bank || 0
+    this.select_bank = moneyAccountType.select_bank || ''
     this.credit_limit_number = moneyAccountType.credit_limit_number || new Decimal128('0')
   }
 }
