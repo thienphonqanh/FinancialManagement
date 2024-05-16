@@ -93,7 +93,7 @@ const moneyAccountTypeIdSchema: ParamSchema = {
           throw new Error(APP_MESSAGES.CREDIT_LIMIT_NUMBER_MUST_BELONG_TO_TYPE_CREDIT_CARD)
         }
       }
-      if (isValid.name !== 'Tài khoản ngân hàng') {
+      if (isValid.name !== 'Tài khoản ngân hàng' && isValid.name !== 'Thẻ tín dụng') {
         if (req.body.select_bank !== undefined) {
           throw new Error(APP_MESSAGES.SELECT_BANK_MUST_BELONG_TO_TYPE_BANK)
         }
