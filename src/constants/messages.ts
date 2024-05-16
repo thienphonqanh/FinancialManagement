@@ -92,6 +92,10 @@ export const APP_MESSAGES = {
   CASH_FLOW_CATEGORY_NOT_FOUND: 'Hạng mục của dòng tiền không hợp lệ',
   MONEY_ACCOUNT_ID_IS_REQUIRED: 'Tài khoản tiền là bắt buộc',
   MONEY_ACCOUNT_ID_MUST_BE_A_STRING: 'Tài khoản tiền phải là chuỗi',
-  MONEY_ACCOUNT_NOT_FOUND: 'Tài khoản tiền phải là chuỗi',
-  ADD_EXPENSE_RECORD_SUCCESS: 'Thêm mới bản ghi chi tiêu thành công'
+  MONEY_ACCOUNT_NOT_FOUND: 'Tài khoản tiền không hợp lệ',
+  SELECT_BANK_MUST_BELONG_TO_TYPE_BANK: 'Không phải loại tài khoản ngân hàng thi không được chọn ngân hàng',
+  CREDIT_LIMIT_NUMBER_MUST_BELONG_TO_TYPE_CREDIT_CARD:
+    'Không phải loại thẻ tín dụng thi không được có hạn mức tín dụng',
+  ADD_EXPENSE_RECORD_SUCCESS: 'Thêm mới bản ghi chi tiêu thành công',
+  UPDATE_MONEY_ACCOUNT_SUCCESS: 'Sửa tài khoản tiền thành công'
 } as const

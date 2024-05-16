@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import { APP_MESSAGES } from '~/constants/messages'
-import { ExpenseRecordReqBody, MoneyAccountReqBody } from '~/models/requests/Admin.requests'
+import { ExpenseRecordReqBody, MoneyAccountReqBody, UpdateMoneyAccountReqBody } from '~/models/requests/Admin.requests'
 import appServices from '~/services/app.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '~/models/requests/User.requests'
+import { Decimal128, ObjectId } from 'mongodb'
 
 export const getCashFlowController = async (req: Request, res: Response, next: NextFunction) => {
   const data = await appServices.getCashFlow()
@@ -31,6 +32,8 @@ export const addMoneyAccountController = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  req.body.user_id = new ObjectId(user_id)
   const result = await appServices.addMoneyAccount(req.body)
   return res.json({ result })
 }
@@ -41,5 +44,27 @@ export const addExpenseRecordController = async (
   next: NextFunction
 ) => {
   const result = await appServices.addExpenseRecord(req.body)
+  return res.json({ result })
+}
+
+export const updateMoneyAccountController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  req.body.user_id = new ObjectId(user_id)
+  /*
+    Các giá trị ban đầu nhận từ req là string
+    -> Chuyển các giá trị cần thiết sang ObjectId hoặc Decimal128
+    -> Các giá trị nào không truyền thì là undefined
+    -> Gán lại req.body
+  */
+  req.body.money_account_type_id !== undefined
+    ? (req.body.money_account_type_id = new ObjectId(req.body.money_account_type_id as string))
+    : undefined
+  req.body.account_balance !== undefined
+    ? (req.body.account_balance = new Decimal128(req.body.account_balance))
+    : undefined
+  req.body.credit_limit_number !== undefined
+    ? (req.body.credit_limit_number = new Decimal128(req.body.credit_limit_number))
+    : undefined
+  const result = await appServices.updateMoneyAccount(req.body)
   return res.json({ result })
 }

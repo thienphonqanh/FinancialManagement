@@ -5,7 +5,7 @@ import CashFlowCategory, { CashFlowCategoryType } from '~/models/schemas/CashFlo
 import CashFlowSubCategory, { CashFlowSubCategoryType } from '~/models/schemas/CashFlowSubCategory.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { APP_MESSAGES } from '~/constants/messages'
-import { ExpenseRecordReqBody, MoneyAccountReqBody } from '~/models/requests/Admin.requests'
+import { ExpenseRecordReqBody, MoneyAccountReqBody, UpdateMoneyAccountReqBody } from '~/models/requests/Admin.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 
 config()
@@ -151,6 +151,54 @@ class AppServices {
     })
     await databaseService.expenseRecords.insertOne(expenseRecord)
     return APP_MESSAGES.ADD_EXPENSE_RECORD_SUCCESS
+  }
+
+  async updateMoneyAccount(payload: UpdateMoneyAccountReqBody) {
+    /*
+      Kiểm tra xem các số Decimal có không
+      Có -> Dạng string chuyển thành Decimal128
+      Không -> Giữ nguyên
+    */
+    const money_account_id = payload.money_account_id
+    const money_account_type_id = payload.money_account_type_id
+    /*
+      Lấy money_account_type_id từ req.body (payload)
+      -> Kiểm tra xem loại tài khoản tiền có phải là thẻ tín dụng không
+        -> Nếu không thì set credit_limit_number = 0
+        -> Phải set = 0 (trở về mặc định) vì nếu ban đầu là thẻ tín dụng thì mới có credit_limit_number
+        -> Sau khi update nếu không là thẻ tín dụng thì không cần credit_limit_number
+      -> Kiểm tra xem loại tài khoản tiền có phải là tài khoản ngân hàng không
+        -> Nếu không thì set select_bank = ''
+        -> Phải set = 0 (trở về mặc định) vì nếu ban đầu là tài khoản ngân hàng thì mới có select_bank
+        -> Sau khi update nếu không là tài khoản ngân hàng thì không cần select_bank
+    */
+    const checkType = await databaseService.moneyAccountTypes.findOne(
+      { _id: new ObjectId(money_account_type_id) },
+      { projection: { name: 1 } }
+    )
+    if (checkType?.name !== 'Thẻ tín dụng') {
+      payload.credit_limit_number = new Decimal128('0')
+    }
+    if (checkType?.name !== 'Tài khoản ngân hàng') {
+      payload.select_bank = ''
+    }
+    // Xóa money_account_id khỏi _payload
+    delete payload.money_account_id
+    // Tìm và cập nhật tài khoản tiền theo money_account_id
+    await databaseService.moneyAccounts.findOneAndUpdate(
+      {
+        _id: new ObjectId(money_account_id)
+      },
+      {
+        $set: {
+          ...payload
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    return APP_MESSAGES.UPDATE_MONEY_ACCOUNT_SUCCESS
   }
 }
 

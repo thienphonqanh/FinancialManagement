@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'
+import { Decimal128, ObjectId } from 'mongodb'
 import { File, Fields } from 'formidable'
 
 export interface CashflowReqBody {
@@ -26,6 +26,18 @@ export interface MoneyAccountReqBody {
   report?: number // Optional
   select_bank?: string // Optional
   credit_limit_number?: string // Optional
+}
+
+export interface UpdateMoneyAccountReqBody {
+  money_account_id?: ObjectId
+  name?: string
+  account_balance?: Decimal128
+  user_id?: ObjectId
+  money_account_type_id?: ObjectId
+  description?: string
+  report?: number
+  select_bank?: string
+  credit_limit_number?: Decimal128
 }
 
 export interface ExpenseRecordReqBody {

@@ -5,9 +5,14 @@ import {
   addMoneyAccountController,
   getMoneyAccountTypeController,
   getMoneyAccountController,
-  addExpenseRecordController
+  addExpenseRecordController,
+  updateMoneyAccountController
 } from '~/controllers/app.controller'
-import { moneyAccountValidator, expenseRecordValidator } from '~/middlewares/apps.middlewares'
+import {
+  moneyAccountValidator,
+  expenseRecordValidator,
+  updateMoneyAccountValidator
+} from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -54,7 +59,7 @@ appsRouter.get(
  * Header: { Authorization: Bearer <access_token> }
  * Body: {
  *  name: string, account_balance: string (Decimal128),
- *  money_account_type_id: string (ObjectId), user_id: string (ObjectId),
+ *  money_account_type_id: string (ObjectId),
  * (Optional)
  *  description: string, report: string (0 - 1) (enum IncludedReport),
  *  select_bank: string, credit_limit_number: string (Decimal128)
@@ -66,6 +71,21 @@ appsRouter.post(
   verifiedUserValidator,
   moneyAccountValidator,
   wrapRequestHandler(addMoneyAccountController)
+)
+
+/**
+ * Description. Update money acccount
+ * Path: /update-money-acccount
+ * Method: PATCH
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: { MoneyAccountSchema }
+ */
+appsRouter.patch(
+  '/update-money-account',
+  accessTokenValidator,
+  verifiedUserValidator,
+  updateMoneyAccountValidator,
+  wrapRequestHandler(updateMoneyAccountController)
 )
 
 /**
