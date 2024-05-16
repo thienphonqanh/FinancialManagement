@@ -290,3 +290,12 @@ export const updateMoneyAccountValidator = validate(
     ['body']
   )
 )
+
+export const getInfoMoneyAccountValidator = validate(
+  checkSchema(
+    {
+      money_account_id: moneyAccountId
+    },
+    ['params']
+  )
+)

@@ -200,6 +200,46 @@ class AppServices {
     )
     return APP_MESSAGES.UPDATE_MONEY_ACCOUNT_SUCCESS
   }
+
+  async getInfoMoneyAccount(money_account_id: string) {
+    const result = await databaseService.moneyAccounts
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(money_account_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'money_account_types',
+            localField: 'money_account_type_id', // Trường trong moneyAccounts
+            foreignField: '_id', // Trường trong money_account_types
+            as: 'money_type_information' // Tên trường kết quả join
+          }
+        },
+        {
+          $unwind: '$money_type_information' // Dùng để "mở" mảng money_type_information ra để truy cập các trường bên trong.
+        },
+        {
+          // Chỉ định các trường mà bạn muốn bao gồm trong kết quả cuối cùng
+          $project: {
+            _id: 1,
+            name: 1,
+            account_balance: 1,
+            user_id: 1,
+            money_account_type_id: 1,
+            description: 1,
+            report: 1,
+            select_bank: 1,
+            credit_limit_number: 1,
+            'money_type_information.icon': 1,
+            'money_type_information.name': 1
+          }
+        }
+      ])
+      .next() // Next để chỉ trả về 1 kết quả -> vì chắc chắn nó sẽ chỉ có 1 nên không dùng toArray()
+    return result
+  }
 }
 
 const appServices = new AppServices()

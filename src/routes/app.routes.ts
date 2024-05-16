@@ -6,12 +6,14 @@ import {
   getMoneyAccountTypeController,
   getMoneyAccountController,
   addExpenseRecordController,
-  updateMoneyAccountController
+  updateMoneyAccountController,
+  getInfoMoneyAccountController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
   expenseRecordValidator,
-  updateMoneyAccountValidator
+  updateMoneyAccountValidator,
+  getInfoMoneyAccountValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -86,6 +88,20 @@ appsRouter.patch(
   verifiedUserValidator,
   updateMoneyAccountValidator,
   wrapRequestHandler(updateMoneyAccountController)
+)
+
+/**
+ * Description: Get information of money account
+ * Path: /money-account/money-account-id
+ * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
+ */
+appsRouter.get(
+  '/money-account/:money_account_id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  getInfoMoneyAccountValidator,
+  wrapRequestHandler(getInfoMoneyAccountController)
 )
 
 /**

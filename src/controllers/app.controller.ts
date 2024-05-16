@@ -68,3 +68,9 @@ export const updateMoneyAccountController = async (req: Request, res: Response, 
   const result = await appServices.updateMoneyAccount(req.body)
   return res.json({ result })
 }
+
+export const getInfoMoneyAccountController = async (req: Request, res: Response, next: NextFunction) => {
+  const { money_account_id } = req.params
+  const result = await appServices.getInfoMoneyAccount(money_account_id)
+  return res.json({ message: APP_MESSAGES.GET_INFORMATION_OF_MONEY_ACCOUNT_SUCCESS, result })
+}
