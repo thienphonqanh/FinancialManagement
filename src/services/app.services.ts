@@ -164,17 +164,36 @@ class AppServices {
       Không -> Giữ nguyên
     */
     const money_account_id = payload.money_account_id
-    const money_account_type_id = payload.money_account_type_id
+    /*
+      Tạo biến để chứa money_account_type_id (loại tài khoản tiền)
+      -> Nếu req.body (payload) người dùng truyền không có money_account_type_id 
+      -> Update nhưng không thay đổi loại tài khoản tiền
+      -> Lấy từ database loại hiện tại đang dùng
+    */
+    let money_account_type_id: string = ''
+    if (payload.money_account_type_id !== undefined) {
+      // !== undefined là req.body có truyền -> người dùng có thay đổi loại tài khoản tiền
+      money_account_type_id = payload.money_account_type_id.toString()
+    } else {
+      // Kiểm tra loại từ database
+      const checkTypeId = await databaseService.moneyAccounts.findOne(
+        { _id: new ObjectId(money_account_id) },
+        { projection: { money_account_type_id: 1 } }
+      )
+      if (checkTypeId !== null) {
+        money_account_type_id = checkTypeId.money_account_type_id.toString()
+      }
+    }
     /*
       Lấy money_account_type_id từ req.body (payload)
       -> Kiểm tra xem loại tài khoản tiền có phải là thẻ tín dụng không
         -> Nếu không thì set credit_limit_number = 0
         -> Phải set = 0 (trở về mặc định) vì nếu ban đầu là thẻ tín dụng thì mới có credit_limit_number
         -> Sau khi update nếu không là thẻ tín dụng thì không cần credit_limit_number
-      -> Kiểm tra xem loại tài khoản tiền có phải là tài khoản ngân hàng không
+      -> Kiểm tra xem loại tài khoản tiền có phải là tài khoản ngân hàng, thẻ tín dụng không
         -> Nếu không thì set select_bank = ''
-        -> Phải set = 0 (trở về mặc định) vì nếu ban đầu là tài khoản ngân hàng thì mới có select_bank
-        -> Sau khi update nếu không là tài khoản ngân hàng thì không cần select_bank
+        -> Phải set = 0 (trở về mặc định) vì nếu ban đầu là tài khoản ngân hàng, thẻ tín dụng thì mới có select_bank
+        -> Sau khi update nếu không là tài khoản ngân hàng, thẻ tín dụng thì không cần select_bank
     */
     const checkType = await databaseService.moneyAccountTypes.findOne(
       { _id: new ObjectId(money_account_type_id) },
@@ -183,7 +202,7 @@ class AppServices {
     if (checkType?.name !== 'Thẻ tín dụng') {
       payload.credit_limit_number = new Decimal128('0')
     }
-    if (checkType?.name !== 'Tài khoản ngân hàng') {
+    if (checkType?.name !== 'Tài khoản ngân hàng' && checkType?.name !== 'Thẻ tín dụng') {
       payload.select_bank = ''
     }
     // Xóa money_account_id khỏi _payload

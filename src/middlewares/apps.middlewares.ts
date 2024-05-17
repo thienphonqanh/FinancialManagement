@@ -81,7 +81,7 @@ const moneyAccountTypeIdSchema: ParamSchema = {
       /*
         Kiểm tra nếu là thẻ tín dụng thì phải có credit_limit_number
         -> Nếu không có credit_limit_number thì báo lỗi
-        Kiểm tra nếu không phải là tài khoản ngân hàng thì không được chọn ngân hàng
+        Kiểm tra nếu không phải là tài khoản ngân hàng, thẻ tín dụng thì không được chọn ngân hàng
       */
       if (isValid.name === 'Thẻ tín dụng') {
         if (req.body.credit_limit_number === undefined) {
