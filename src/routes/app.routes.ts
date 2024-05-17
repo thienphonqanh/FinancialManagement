@@ -7,6 +7,7 @@ import {
   getMoneyAccountController,
   addExpenseRecordController,
   updateMoneyAccountController,
+  deleteMoneyAccountController,
   getInfoMoneyAccountController
 } from '~/controllers/app.controller'
 import {
@@ -89,6 +90,21 @@ appsRouter.patch(
   updateMoneyAccountValidator,
   wrapRequestHandler(updateMoneyAccountController)
 )
+
+
+/**
+ * Description: DELETE a collection in  money account
+ * Path: /app/delete-money-account
+ * Method: DELETE
+ * Header: { Authorization: Bearer <access_token> }
+ */
+appsRouter.delete(
+  '/delete-money-account', 
+  accessTokenValidator, 
+  verifiedUserValidator, 
+  wrapRequestHandler(deleteMoneyAccountController)
+)
+
 
 /**
  * Description: Get information of money account

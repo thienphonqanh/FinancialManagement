@@ -5,7 +5,7 @@ import CashFlowCategory, { CashFlowCategoryType } from '~/models/schemas/CashFlo
 import CashFlowSubCategory, { CashFlowSubCategoryType } from '~/models/schemas/CashFlowSubCategory.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { APP_MESSAGES } from '~/constants/messages'
-import { ExpenseRecordReqBody, MoneyAccountReqBody, UpdateMoneyAccountReqBody } from '~/models/requests/Admin.requests'
+import { DeleteMoneyAccountReqBody, ExpenseRecordReqBody, MoneyAccountReqBody, UpdateMoneyAccountReqBody } from '~/models/requests/Admin.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 
 config()
@@ -153,6 +153,25 @@ class AppServices {
     return APP_MESSAGES.ADD_EXPENSE_RECORD_SUCCESS
   }
 
+
+  async deleteMoneyAccountService(payload: DeleteMoneyAccountReqBody) {
+    const money_account_id = payload.money_account_id
+  
+      const query = {
+        _id: new ObjectId(money_account_id) , 
+        user_id: new ObjectId(payload.user_id)
+      }
+      const result = await databaseService.moneyAccounts.deleteOne(query)
+      if(result['deletedCount'] == 1){
+        return {
+          'deletedCount': 1,
+          'msg': APP_MESSAGES.DELETE_MONEY_ACCOUNT_SUCCESS
+        }
+      }else return  {
+        'deletedCount': 0,
+        'msg': APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND
+      }
+  }
   async updateMoneyAccount(payload: UpdateMoneyAccountReqBody) {
     // Chuyển report từ string sang number
     if (payload.report !== undefined && (payload.report.toString() === '0' || payload.report.toString() === '1')) {
@@ -223,6 +242,9 @@ class AppServices {
     )
     return APP_MESSAGES.UPDATE_MONEY_ACCOUNT_SUCCESS
   }
+
+
+
 
   async getInfoMoneyAccount(money_account_id: string) {
     const result = await databaseService.moneyAccounts

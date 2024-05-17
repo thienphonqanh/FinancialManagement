@@ -40,6 +40,11 @@ export interface UpdateMoneyAccountReqBody {
   credit_limit_number?: Decimal128
 }
 
+export interface DeleteMoneyAccountReqBody{
+  money_account_id?: ObjectId,
+  user_id?: ObjectId,
+}
+
 export interface ExpenseRecordReqBody {
   amount_of_money: string
   cash_flow_category_id: ObjectId

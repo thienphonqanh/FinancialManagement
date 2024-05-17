@@ -72,6 +72,7 @@ export const APP_MESSAGES = {
   CREDIT_LIMIT_NUMBER_IS_REQUIRED: 'Hạn mức tín dụng là bắt buộc',
   CREDIT_LIMIT_NUMBER_MUST_BE_A_NUMBER: 'Hạn mức tín dụng phải là số',
   CREDIT_LIMIT_NUMBER_MUST_BE_GREATER_THAN_0: 'Hạn mức tín dụng phải lớn hơn 0',
+  DELETE_MONEY_ACCOUNT_SUCCESS:'Xóa tài khoản thành công',
   REPORT_MUST_BE_A_NUMBER: 'Bao gồm báo cáo phải là số',
   REPORT_MUST_BE_0_OR_1: 'Bao gồm báo cáo phải là 0 hoặc 1',
   ACCOUNT_BALANCE_MUST_IS_REQUIRED: 'Số dư tài khoản là bắt buộc',
