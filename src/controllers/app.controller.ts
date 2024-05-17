@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import { APP_MESSAGES } from '~/constants/messages'
-import { ExpenseRecordReqBody, MoneyAccountReqBody, UpdateMoneyAccountReqBody } from '~/models/requests/Admin.requests'
 import appServices from '~/services/app.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { Decimal128, ObjectId } from 'mongodb'
+import { ExpenseRecordReqBody, MoneyAccountReqBody } from '~/models/requests/App.requests'
 
 export const getCashFlowController = async (req: Request, res: Response, next: NextFunction) => {
   const data = await appServices.getCashFlow()
@@ -79,5 +79,5 @@ export const deleteMoneyAccountController = async (req: Request, res: Response, 
   const { user_id } = req.decoded_authorization as TokenPayload
   req.body.user_id = new ObjectId(user_id)
   const result = await appServices.deleteMoneyAccountService(req.body)
-  return res.json({result})
+  return res.json({ result })
 }

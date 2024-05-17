@@ -1,79 +1,35 @@
 import databaseService from './database.services'
 import CashFlowCategory from '~/models/schemas/CashFlowCategory.schemas'
 import { ObjectId } from 'mongodb'
-import fsPromise from 'fs/promises'
-import { Request } from 'express'
-import { uploadFileToS3 } from '~/utils/s3'
-import { CompleteMultipartUploadCommandOutput } from '@aws-sdk/client-s3'
 import { ADMINS_MESSAGES } from '~/constants/messages'
 import CashFlow from '~/models/schemas/CashFlow.schemas'
-import { Fields, File } from 'formidable'
 import CashFlowSubCategory from '~/models/schemas/CashFlowSubCategory.schemas'
 import MoneyAccountType from '~/models/schemas/MoneyAccountType.schemas'
-import { MoneyAccountTypeReqBody } from '~/models/requests/Admin.requests'
+import { CashflowCategoryReqBody, CashflowReqBody, MoneyAccountTypeReqBody } from '~/models/requests/Admin.requests'
+import { CashFlowType } from '~/constants/enums'
 class AdminsService {
   // Thêm mới dòng tiền
-  async addCashflow(req: Request) {
-    const files = req.body.files as File[]
-    const fields = req.body.fields as Fields<string>
-
-    const url = await Promise.all(
-      files.map(async (file) => {
-        const s3Result = await uploadFileToS3({
-          filename: 'icons/cashflow/' + file.newFilename,
-          contentType: (await import('mime')).default.getType(file.filepath) as string,
-          filepath: file.filepath
-        })
-        fsPromise.unlink(file.filepath)
-        return {
-          url: (s3Result as CompleteMultipartUploadCommandOutput).Location as string
-        }
-      })
-    )
-    // Lấy data từ fields đã parse từ form-data
-    const name = Array.isArray(fields.name) ? fields.name[0] : fields.name
+  async addCashflow(payload: CashflowReqBody) {
     const cashFlow = new CashFlow({
-      icon: url[0].url,
-      name: name as string
+      icon: payload.icon,
+      name: payload.name
     })
-
     await databaseService.cashFlows.insertOne(cashFlow)
     return ADMINS_MESSAGES.ADD_CASH_FLOW_SUCCESS
   }
 
   // Thêm mới hạng mục theo dòng tiền
-  async addCashflowCategory(req: Request) {
-    const files = req.body.files as File[]
-    const fields = req.body.fields as Fields<string>
-
-    const url = await Promise.all(
-      files.map(async (file) => {
-        const s3Result = await uploadFileToS3({
-          filename: 'icons/cashflow-category/' + file.newFilename,
-          contentType: (await import('mime')).default.getType(file.filepath) as string,
-          filepath: file.filepath
-        })
-        fsPromise.unlink(file.filepath)
-        return {
-          url: (s3Result as CompleteMultipartUploadCommandOutput).Location as string
-        }
-      })
-    )
-    // Lấy data từ fields đã parse từ form-data
-    const name = Array.isArray(fields.name) ? fields.name[0] : fields.name
-    const cash_flow_id = Array.isArray(fields.cash_flow_id) ? fields.cash_flow_id[0] : fields.cash_flow_id
-    const parent_id = Array.isArray(fields.parent_id) ? fields.parent_id[0] : fields.parent_id
+  async addCashflowCategory(payload: CashflowCategoryReqBody) {
     // Kiểm tra tồn tại của parent_id -> (sub_category)
-    if (parent_id !== undefined && parent_id.trim() !== '') {
+    if (payload.parent_id !== undefined) {
       // Thêm mới sub category
       const cashFlowSubCategory = new CashFlowSubCategory({
-        icon: url[0].url,
-        name: name as string,
+        icon: payload.icon,
+        name: payload.name,
         isChosen: 0, // Mặc định: không chọn
-        parent_id: new ObjectId(parent_id as string)
+        parent_id: new ObjectId(payload.parent_id)
       })
-      // Thêm vào db
-      await databaseService.cashFlowCategories.findOneAndUpdate({ _id: new ObjectId(parent_id as string) }, [
+      await databaseService.cashFlowCategories.findOneAndUpdate({ _id: new ObjectId(payload.parent_id) }, [
         {
           $set: {
             sub_category: {
@@ -84,13 +40,34 @@ class AdminsService {
       ])
       return ADMINS_MESSAGES.ADD_CASH_FLOW_CATEGORY_SUCCESS
     }
+    /*
+      Kiểm tra loại dòng tiền
+      -> Nếu là 'Chi tiền' thì cash_flow_type = 0 (Spending)
+      -> Nếu là 'Thu tiền' thì cash_flow_type = 1 (Revenue)
+    */
+    let cash_flow_type: number = -1
+    if (payload.cash_flow_type === undefined) {
+      const checkType = await databaseService.cashFlows.findOne(
+        { _id: new ObjectId(payload.cash_flow_id) },
+        { projection: { name: 1 } }
+      )
+      if (checkType !== null) {
+        checkType.name === 'Chi tiền'
+          ? (cash_flow_type = CashFlowType.Spending)
+          : (cash_flow_type = CashFlowType.Revenue)
+      }
+    } else {
+      cash_flow_type = payload.cash_flow_type
+    }
+    // Chuyển sang kiểu số
+    cash_flow_type = parseInt(cash_flow_type.toString())
     // Thêm mới parent category
     const cashFlowCategory = new CashFlowCategory({
-      icon: url[0].url,
-      name: name as string,
-      cash_flow_id: new ObjectId(cash_flow_id as string)
+      icon: payload.icon,
+      name: payload.name,
+      cash_flow_id: new ObjectId(payload.cash_flow_id),
+      cash_flow_type: cash_flow_type
     })
-    // Thêm vào db
     await databaseService.cashFlowCategories.insertOne(cashFlowCategory)
     return ADMINS_MESSAGES.ADD_CASH_FLOW_CATEGORY_SUCCESS
   }
@@ -98,10 +75,9 @@ class AdminsService {
   // Thêm mới loại tài khoản tiền (tiền mặt, ngân hàng, ...)
   async addMoneyAccountType(payload: MoneyAccountTypeReqBody) {
     const moneyAccountType = new MoneyAccountType({
-      icon: payload.image,
+      icon: payload.icon,
       name: payload.name
     })
-
     await databaseService.moneyAccountTypes.insertOne(moneyAccountType)
     return ADMINS_MESSAGES.ADD_MONEY_ACCOUNT_TYPE_SUCCESS
   }

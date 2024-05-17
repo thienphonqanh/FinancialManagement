@@ -43,8 +43,18 @@ export const USERS_MESSAGES = {
 
 export const ADMINS_MESSAGES = {
   CASH_FLOW_NAME_IS_REQUIRED: 'Tên dòng tiền không được để trống',
+  CASH_FLOW_NAME_MUST_BE_A_STRING: 'Tên dòng tiền phải là chuỗi',
   CASH_FLOW_NAME_IS_EXIST: 'Tên dòng tiền đã tồn tại',
+  ICON_PATH_IS_REQUIRED: 'Đường dẫn ảnh không được để trống',
+  ICON_PATH_MUST_BE_A_STRING: 'Đường dẫn ảnh phải là chuỗi',
+  CASH_FLOW_TYPE_BE_A_NUMBER: 'Loại dòng tiền phải là số',
+  CASH_FLOW_TYPE_BE_0_OR_1: 'Loại dòng tiền phải là 0 hoặc 1',
+  LOAN_CATEGORY_MUST_CHOOSE_REVENUE_OR_SPENDING: 'Hạng mục vay nợ phải chọn là thu hoặc chi',
+  ONLY_LOAN_CATEGORY_MUST_BE_CHOOSE_REVENUE_OR_SPENDING: 'Chỉ hạng mục vay nợ mới phải chọn là thu hoặc chi',
+  CASH_FLOW_ID_IS_REQUIRED: 'ID dòng tiền không được để trống',
+  CASH_FLOW_PARENT_CATEGORY_ID_IS_REQUIRED: 'ID hạng mục cha không được để trống',
   CASH_FLOW_CATEGORY_NAME_IS_REQUIRED: 'Tên hạng mục không được để trống',
+  CASH_FLOW_CATEGORY_NAME_MUST_BE_A_STRING: 'Tên hạng mục phải là chuỗi',
   CASH_FLOW_CATEGORY_NAME_IS_EXIST: 'Tên hạng mục đã tồn tại',
   CASH_FLOW_CATEGORY_MUST_BELONG_TO_CASH_FLOW: 'Hạng mục phải thuộc về dòng tiền',
   CASH_FLOW_NOT_FOUND: 'Không tìm thấy dòng tiền',
@@ -52,14 +62,12 @@ export const ADMINS_MESSAGES = {
   ADD_CASH_FLOW_SUCCESS: 'Thêm dòng tiền thành công',
   ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công',
   USER_IS_NOT_ADMIN: 'Bạn không có quyền này',
-  MONEY_ACCOUNT_TYPE_ICON_IS_REQUIRED: 'Ảnh loại tài khoản không được để trống',
-  MONEY_ACCOUNT_TYPE_ICON_MUST_BE_A_STRING: 'Ảnh loại tài khoản phải là chuỗi',
-  MONEY_ACCOUNT_TYPE_ICON_IS_EXIST: 'Ảnh loại tài khoản đã tồn tại',
   MONEY_ACCOUNT_TYPE_NAME_IS_REQUIRED: 'Tên loại tài khoản được để trống',
   MONEY_ACCOUNT_TYPE_NAME_MUST_BE_A_STRING: 'Tên loại tài khoản phải là chuỗi',
   MONEY_ACCOUNT_TYPE_NAME_IS_EXIST: 'Tên loại tài khoản đã tồn tại',
-
-  ADD_MONEY_ACCOUNT_TYPE_SUCCESS: 'Thêm loại tài khoản thành công'
+  ADD_MONEY_ACCOUNT_TYPE_SUCCESS: 'Thêm loại tài khoản thành công',
+  CAN_NOT_BE_BOTH_A_PARENT_AND_A_CHILD_CATEGORY: 'Không thể vừa là hạng mục cha vừa là hạng mục con',
+  MUST_BE_A_PARENT_OR_CHILD_CATEGORY: 'Phải là hạng mục cha hoặc hạng mục con'
 } as const
 
 export const APP_MESSAGES = {
@@ -72,7 +80,7 @@ export const APP_MESSAGES = {
   CREDIT_LIMIT_NUMBER_IS_REQUIRED: 'Hạn mức tín dụng là bắt buộc',
   CREDIT_LIMIT_NUMBER_MUST_BE_A_NUMBER: 'Hạn mức tín dụng phải là số',
   CREDIT_LIMIT_NUMBER_MUST_BE_GREATER_THAN_0: 'Hạn mức tín dụng phải lớn hơn 0',
-  DELETE_MONEY_ACCOUNT_SUCCESS:'Xóa tài khoản thành công',
+  DELETE_MONEY_ACCOUNT_SUCCESS: 'Xóa tài khoản thành công',
   REPORT_MUST_BE_A_NUMBER: 'Bao gồm báo cáo phải là số',
   REPORT_MUST_BE_0_OR_1: 'Bao gồm báo cáo phải là 0 hoặc 1',
   ACCOUNT_BALANCE_MUST_IS_REQUIRED: 'Số dư tài khoản là bắt buộc',

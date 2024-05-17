@@ -91,7 +91,6 @@ appsRouter.patch(
   wrapRequestHandler(updateMoneyAccountController)
 )
 
-
 /**
  * Description: DELETE a collection in  money account
  * Path: /app/delete-money-account
@@ -99,12 +98,11 @@ appsRouter.patch(
  * Header: { Authorization: Bearer <access_token> }
  */
 appsRouter.delete(
-  '/delete-money-account', 
-  accessTokenValidator, 
-  verifiedUserValidator, 
+  '/delete-money-account',
+  accessTokenValidator,
+  verifiedUserValidator,
   wrapRequestHandler(deleteMoneyAccountController)
 )
-
 
 /**
  * Description: Get information of money account

@@ -5,7 +5,12 @@ import CashFlowCategory, { CashFlowCategoryType } from '~/models/schemas/CashFlo
 import CashFlowSubCategory, { CashFlowSubCategoryType } from '~/models/schemas/CashFlowSubCategory.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { APP_MESSAGES } from '~/constants/messages'
-import { DeleteMoneyAccountReqBody, ExpenseRecordReqBody, MoneyAccountReqBody, UpdateMoneyAccountReqBody } from '~/models/requests/Admin.requests'
+import {
+  DeleteMoneyAccountReqBody,
+  ExpenseRecordReqBody,
+  MoneyAccountReqBody,
+  UpdateMoneyAccountReqBody
+} from '~/models/requests/App.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 
 config()
@@ -47,6 +52,7 @@ class AppServices {
             icon: item.icon,
             name: item.name,
             cash_flow_id: item.cash_flow_id,
+            cash_flow_type: item.cash_flow_type,
             created_at: item.created_at,
             updated_at: item.updated_at,
             isChosen: item.isChosen,
@@ -144,6 +150,7 @@ class AppServices {
     const expenseRecord = new ExpenseRecord({
       ...payload,
       amount_of_money: new Decimal128(payload.amount_of_money),
+      cash_flow_id: new ObjectId(payload.cash_flow_id),
       cash_flow_category_id: new ObjectId(payload.cash_flow_category_id),
       money_account_id: new ObjectId(payload.money_account_id),
       user_id: new ObjectId(payload.user_id),
@@ -153,23 +160,23 @@ class AppServices {
     return APP_MESSAGES.ADD_EXPENSE_RECORD_SUCCESS
   }
 
-
   async deleteMoneyAccountService(payload: DeleteMoneyAccountReqBody) {
     const money_account_id = payload.money_account_id
-  
-      const query = {
-        _id: new ObjectId(money_account_id) , 
-        user_id: new ObjectId(payload.user_id)
+
+    const query = {
+      _id: new ObjectId(money_account_id),
+      user_id: new ObjectId(payload.user_id)
+    }
+    const result = await databaseService.moneyAccounts.deleteOne(query)
+    if (result['deletedCount'] == 1) {
+      return {
+        deletedCount: 1,
+        msg: APP_MESSAGES.DELETE_MONEY_ACCOUNT_SUCCESS
       }
-      const result = await databaseService.moneyAccounts.deleteOne(query)
-      if(result['deletedCount'] == 1){
-        return {
-          'deletedCount': 1,
-          'msg': APP_MESSAGES.DELETE_MONEY_ACCOUNT_SUCCESS
-        }
-      }else return  {
-        'deletedCount': 0,
-        'msg': APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND
+    } else
+      return {
+        deletedCount: 0,
+        msg: APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND
       }
   }
   async updateMoneyAccount(payload: UpdateMoneyAccountReqBody) {
@@ -242,9 +249,6 @@ class AppServices {
     )
     return APP_MESSAGES.UPDATE_MONEY_ACCOUNT_SUCCESS
   }
-
-
-
 
   async getInfoMoneyAccount(money_account_id: string) {
     const result = await databaseService.moneyAccounts

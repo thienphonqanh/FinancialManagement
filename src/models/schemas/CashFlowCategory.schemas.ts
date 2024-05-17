@@ -1,10 +1,12 @@
 import { ObjectId } from 'mongodb'
+import { CashFlowType } from '~/constants/enums'
 
 export interface CashFlowCategoryType {
   _id?: ObjectId
   icon: string
   name: string
   cash_flow_id: ObjectId
+  cash_flow_type: CashFlowType
   sub_category?: []
   created_at?: Date
   updated_at?: Date
@@ -17,6 +19,7 @@ export default class CashFlowCategory {
   icon: string
   name: string
   cash_flow_id: ObjectId
+  cash_flow_type: CashFlowType
   sub_category: []
   created_at: Date
   updated_at: Date
@@ -29,6 +32,7 @@ export default class CashFlowCategory {
     this.icon = cashFlowCategoryType.icon
     this.name = cashFlowCategoryType.name
     this.cash_flow_id = cashFlowCategoryType.cash_flow_id
+    this.cash_flow_type = cashFlowCategoryType.cash_flow_type
     this.sub_category = cashFlowCategoryType.sub_category || []
     this.created_at = cashFlowCategoryType.created_at || date
     this.updated_at = cashFlowCategoryType.updated_at || date

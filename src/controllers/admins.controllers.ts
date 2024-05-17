@@ -8,7 +8,7 @@ export const addCashFlowController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const result = await adminsService.addCashflow(req)
+  const result = await adminsService.addCashflow(req.body)
   return res.json({ result })
 }
 
@@ -17,7 +17,7 @@ export const addCashflowCategoryController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const result = await adminsService.addCashflowCategory(req)
+  const result = await adminsService.addCashflowCategory(req.body)
   return res.json({ result })
 }
 

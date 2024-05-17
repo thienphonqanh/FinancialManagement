@@ -26,3 +26,8 @@ export enum TokenType {
   EmailVerifyToken,
   ForgotPasswordToken
 }
+
+export enum CashFlowType {
+  Spending, // Chi tiêu, mặc định = 0
+  Revenue // Thu
+}

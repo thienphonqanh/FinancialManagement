@@ -19,7 +19,7 @@ const adminsRouter = Router()
  * Path: /add-cash-flow
  * Method: POST
  * Header: { Authorization: Bearer <access_token> }
- * Body: { image: file, name: string }
+ * Body: { icon: string, name: string }
  */
 adminsRouter.post(
   '/add-cash-flow',
@@ -35,7 +35,7 @@ adminsRouter.post(
  * Path: /add-cash-flow-category
  * Method: POST
  * Header: { Authorization: Bearer <access_token> }
- * Body: { image: file, name: string, cashflow_id: string, parent_id: string (sub_category) }
+ * Body: { icon: string, name: string, cash_flow_id: string, parent_id: string (sub_category) }
  */
 adminsRouter.post(
   '/add-cash-flow-category',
@@ -51,7 +51,7 @@ adminsRouter.post(
  * Path: /add-money-acccount-type
  * Method: POST
  * Header: { Authorization: Bearer <access_token> }
- * Body: { image: string, name: string }
+ * Body: { icon: string, name: string }
  */
 adminsRouter.post(
   '/add-money-account-type',
