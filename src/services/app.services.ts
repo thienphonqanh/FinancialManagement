@@ -154,6 +154,10 @@ class AppServices {
   }
 
   async updateMoneyAccount(payload: UpdateMoneyAccountReqBody) {
+    // Chuyển report từ string sang number
+    if (payload.report !== undefined && (payload.report.toString() === '0' || payload.report.toString() === '1')) {
+      payload.report = parseInt(payload.report.toString())
+    }
     /*
       Kiểm tra xem các số Decimal có không
       Có -> Dạng string chuyển thành Decimal128
