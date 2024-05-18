@@ -358,7 +358,9 @@ export const expenseRecordValidator = validate(
               throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
             }
             // Kiểm tra xem id hạng mục có hợp lệ không
-            const isValid = await databaseService.cashFlowCategories.findOne({ _id: new ObjectId(value) })
+            const isValid = await databaseService.cashFlowCategories.findOne({
+              $or: [{ _id: new ObjectId(value) }, { 'sub_category._id': new ObjectId(value) }]
+            })
             if (isValid === null) {
               throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
             }
