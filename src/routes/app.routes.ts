@@ -125,14 +125,13 @@ appsRouter.get(
  * Header: { Authorization: Bearer <access_token> }
  * Body: {
  *  amount_of_money: string (Decimal128), cash_flow_category_id: string (ObjectId),
- *  cash_flow_category_id: string (ObjectId), user_id: string (ObjectId),
+ *  money_account_id: string (ObjectId),
  * (Optional)
  *  description: string, report: number (enum IncludedReport),
  *  occur_date: date, trip_or_event: string, location: string,
- *  pay_for_who: string, collect_from_who: string, borrow_from_who: string,
- *  repayment_date: date, cost_incurred: string (Decimal128),
- *  cost_incurred_category_id: string (ObjectId), debtor: string,
- *  debt_collection_date: date, transfer_to_account_id: string (ObjectId),
+ *  pay_for_who: string, collect_from_who: string,
+ *  repayment_date: date, debt_collection_date: date,
+ *  cost_incurred: string (Decimal128), cost_incurred_category_id: string (ObjectId),
  *  proof_image: string
  * }
  */

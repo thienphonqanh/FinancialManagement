@@ -144,6 +144,16 @@ class AppServices {
 
   // Thêm mới bản ghi chi tiêu
   async addExpenseRecord(payload: ExpenseRecordReqBody) {
+    // Kiểm tra tồn tại các trường date -> chuyển string thành date
+    if (payload.occur_date !== undefined) {
+      payload.occur_date = new Date(payload.occur_date)
+    }
+    if (payload.debt_collection_date !== undefined) {
+      payload.debt_collection_date = new Date(payload.debt_collection_date)
+    }
+    if (payload.repayment_date !== undefined) {
+      payload.repayment_date = new Date(payload.repayment_date)
+    }
     if (payload.report !== undefined && (payload.report.toString() === '0' || payload.report.toString() === '1')) {
       payload.report = parseInt(payload.report.toString())
     }
@@ -153,8 +163,8 @@ class AppServices {
       cash_flow_id: new ObjectId(payload.cash_flow_id),
       cash_flow_category_id: new ObjectId(payload.cash_flow_category_id),
       money_account_id: new ObjectId(payload.money_account_id),
-      user_id: new ObjectId(payload.user_id),
-      cost_incurred: new Decimal128(payload.cost_incurred || '0') // Add this line to convert cost_incurred to Decimal128
+      cost_incurred: new Decimal128(payload.cost_incurred || '0'),
+      cost_incurred_category_id: new ObjectId(payload.cost_incurred_category_id)
     })
     await databaseService.expenseRecords.insertOne(expenseRecord)
     return APP_MESSAGES.ADD_EXPENSE_RECORD_SUCCESS

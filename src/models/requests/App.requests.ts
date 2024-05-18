@@ -47,6 +47,5 @@ export interface ExpenseRecordReqBody {
   cost_incurred_category_id?: ObjectId
   debtor?: string
   debt_collection_date?: Date
-  transfer_to_account_id?: ObjectId
   proof_image?: string
 }

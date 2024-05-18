@@ -43,6 +43,8 @@ export const addExpenseRecordController = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  req.body.user_id = new ObjectId(user_id)
   const result = await appServices.addExpenseRecord(req.body)
   return res.json({ result })
 }

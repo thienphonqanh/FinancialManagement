@@ -6,10 +6,11 @@ import { validate } from '~/utils/validation'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { Request } from 'express'
+import { CashFlowType } from '~/constants/enums'
 
 const accountBalanceSchema: ParamSchema = {
   notEmpty: {
-    errorMessage: APP_MESSAGES.ACCOUNT_BALANCE_MUST_IS_REQUIRED
+    errorMessage: APP_MESSAGES.ACCOUNT_BALANCE_IS_REQUIRED
   },
   isNumeric: {
     errorMessage: APP_MESSAGES.ACCOUNT_BALANCE_MUST_BE_A_NUMBER
@@ -197,12 +198,25 @@ const moneyAccountId: ParamSchema = {
   trim: true,
   custom: {
     options: async (value: string) => {
+      if (!ObjectId.isValid(value)) {
+        throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
+      }
       // Kiểm tra xem id tài khoản tiền có hợp lệ không
       const isValid = await databaseService.moneyAccounts.findOne({ _id: new ObjectId(value) })
       if (isValid === null) {
         throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
       }
     }
+  }
+}
+
+const dateSchema: ParamSchema = {
+  isISO8601: {
+    options: {
+      strict: true,
+      strictSeparator: true
+    },
+    errorMessage: APP_MESSAGES.DATE_MUST_BE_ISO8601
   }
 }
 
@@ -239,6 +253,47 @@ export const expenseRecordValidator = validate(
           }
         }
       },
+      occur_date: {
+        optional: true,
+        ...dateSchema
+      },
+      repayment_date: {
+        optional: true,
+        ...dateSchema
+      },
+      debt_collection_date: {
+        optional: true,
+        ...dateSchema
+      },
+      cost_incurred: {
+        optional: true,
+        notEmpty: {
+          errorMessage: APP_MESSAGES.COST_INCURRED_IS_REQUIRED
+        },
+        isNumeric: {
+          errorMessage: APP_MESSAGES.COST_INCURRED_MUST_BE_A_NUMBER
+        },
+        custom: {
+          options: (value) => {
+            if (value < 0) {
+              throw new Error(APP_MESSAGES.COST_INCURRED_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0)
+            }
+            return true
+          }
+        }
+      },
+      pay_for_who: {
+        optional: true,
+        isString: {
+          errorMessage: APP_MESSAGES.PAY_FOR_WHO_MUST_BE_A_STRING
+        }
+      },
+      collect_from_who: {
+        optional: true,
+        isString: {
+          errorMessage: APP_MESSAGES.COLLECT_FROM_WHO_MUST_BE_A_STRING
+        }
+      },
       cash_flow_category_id: {
         notEmpty: {
           errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_IS_REQUIRED
@@ -248,7 +303,60 @@ export const expenseRecordValidator = validate(
         },
         trim: true,
         custom: {
+          options: async (value: string, { req }) => {
+            if (!ObjectId.isValid(value)) {
+              throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+            }
+            // Kiểm tra xem id hạng mục có hợp lệ không
+            const isValid = await databaseService.cashFlowCategories.findOne({
+              $or: [{ _id: new ObjectId(value) }, { 'sub_category._id': new ObjectId(value) }]
+            })
+            if (isValid === null) {
+              throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+            }
+            /*
+              Kiểm tra loại hạng mục thuộc về thu hay chi
+              -> Spending: 0 -> Chi tiền
+              -> Revenue: 1 -> Thu tiền
+              -> Đối với loại chi tiền thì mới có chi phí phát sinh, chi cho ai, ngày trả nợ (cost_incurred, cost_incurred_category_id, pay_for_who, repayment_date)
+              -> Đối với loại thu tiền thì mới có thu tiền từ ai, ngày thu nợ (collect_from_who, debt_collection_date)
+            */
+            if (isValid.cash_flow_type === CashFlowType.Revenue) {
+              if (req.body.cost_incurred !== undefined || req.body.cost_incurred_category_id !== undefined) {
+                throw new Error(APP_MESSAGES.COST_INCURRED_MUST_BELONG_TO_SPENDING)
+              }
+              if (req.body.pay_for_who !== undefined) {
+                throw new Error(APP_MESSAGES.PAY_FOR_WHO_MUST_BELONG_TO_SPENDING)
+              }
+              if (req.body.repayment_date !== undefined) {
+                throw new Error(APP_MESSAGES.REPAYMENT_DATE_MUST_BELONG_TO_SPENDING)
+              }
+            }
+            if (isValid.cash_flow_type === CashFlowType.Spending) {
+              if (req.body.collect_from_who !== undefined) {
+                throw new Error(APP_MESSAGES.COLLECT_FROM_WHO_MUST_BELONG_TO_REVENUE)
+              }
+              if (req.body.debt_collection_date !== undefined) {
+                throw new Error(APP_MESSAGES.DEBT_COLLECTION_DATE_MUST_BELONG_TO_REVENUE)
+              }
+            }
+          }
+        }
+      },
+      cost_incurred_category_id: {
+        optional: true,
+        notEmpty: {
+          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
           options: async (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+            }
             // Kiểm tra xem id hạng mục có hợp lệ không
             const isValid = await databaseService.cashFlowCategories.findOne({ _id: new ObjectId(value) })
             if (isValid === null) {
@@ -257,6 +365,7 @@ export const expenseRecordValidator = validate(
           }
         }
       },
+      report: reportSchema,
       money_account_id: moneyAccountId
     },
     ['body']
