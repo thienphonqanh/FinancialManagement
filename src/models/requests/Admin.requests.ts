@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb'
+import { ParamsDictionary } from 'express-serve-static-core'
 
 export interface CashflowReqBody {
   icon: string
@@ -11,6 +12,10 @@ export interface UpdateCashflowReqBody {
   icon: string
   name: string
   isChosen?: number
+}
+
+export interface DeleteCashflowReqParams extends ParamsDictionary {
+  cash_flow_id: string
 }
 
 export interface CashflowCategoryReqBody {

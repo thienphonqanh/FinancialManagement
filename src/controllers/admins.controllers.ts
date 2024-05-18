@@ -3,9 +3,11 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import {
   CashflowCategoryReqBody,
   CashflowReqBody,
+  DeleteCashflowReqParams,
   MoneyAccountTypeReqBody,
   UpdateCashflowReqBody
 } from '~/models/requests/Admin.requests'
+import { TokenPayload } from '~/models/requests/User.requests'
 import adminsService from '~/services/admins.services'
 
 export const addCashFlowController = async (
@@ -23,6 +25,16 @@ export const updateCashFlowController = async (
   next: NextFunction
 ) => {
   const result = await adminsService.updateCashflow(req.body)
+  return res.json({ result })
+}
+
+export const deleteCashFlowController = async (
+  req: Request<DeleteCashflowReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { cash_flow_id } = req.params
+  const result = await adminsService.deleteCashflow(cash_flow_id)
   return res.json({ result })
 }
 

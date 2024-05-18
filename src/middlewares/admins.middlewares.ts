@@ -109,6 +109,29 @@ export const updateCashFlowValidator = validate(
   )
 )
 
+// Validator cho xoá dòng tiền (deleteCashFlow)
+export const deleteCashFlowValidator = validate(
+  checkSchema(
+    {
+      cash_flow_id: {
+        custom: {
+          options: async (value) => {
+            if (!ObjectId.isValid(value)) {
+              throw new Error(ADMINS_MESSAGES.CASH_FLOW_NOT_FOUND)
+            }
+            const isExist = await databaseService.cashFlows.findOne({ _id: new ObjectId(value as string) })
+            if (isExist === null) {
+              throw new Error(ADMINS_MESSAGES.CASH_FLOW_NOT_FOUND)
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['params']
+  )
+)
+
 // Validator cho thêm hạng mục (addCashFlowCategory)
 export const cashFlowCategoryValidator = validate(
   checkSchema(

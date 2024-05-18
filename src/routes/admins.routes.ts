@@ -3,13 +3,15 @@ import {
   addCashflowCategoryController,
   addCashFlowController,
   addMoneyAccountTypeController,
-  updateCashFlowController
+  updateCashFlowController,
+  deleteCashFlowController
 } from '~/controllers/admins.controllers'
 import {
   cashFlowCategoryValidator,
   cashFlowValidator,
   moneyAccountTypeValidator,
-  updateCashFlowValidator
+  updateCashFlowValidator,
+  deleteCashFlowValidator
 } from '~/middlewares/admins.middlewares'
 import { accessTokenValidator, userRoleValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -46,6 +48,22 @@ adminsRouter.patch(
   verifiedUserValidator,
   updateCashFlowValidator,
   wrapRequestHandler(updateCashFlowController)
+)
+
+/**
+ * Description. Delete cash flow
+ * Path: /delete-cash-flow
+ * Method: PATCH
+ * Header: { Authorization: Bearer <access_token> }
+ * Params: { cash_flow_id: string (ObjectId) }
+ */
+adminsRouter.delete(
+  '/delete-cash-flow/:cash_flow_id',
+  accessTokenValidator,
+  userRoleValidator,
+  verifiedUserValidator,
+  deleteCashFlowValidator,
+  wrapRequestHandler(deleteCashFlowController)
 )
 
 /**

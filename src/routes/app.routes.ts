@@ -109,6 +109,7 @@ appsRouter.delete(
  * Path: /money-account/money-account-id
  * Method: GET
  * Header: { Authorization: Bearer <access_token> }
+ * Params: { money_account_id: string (ObjectId) }
  */
 appsRouter.get(
   '/money-account/:money_account_id',

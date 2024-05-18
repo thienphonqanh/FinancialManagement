@@ -40,6 +40,14 @@ class AdminsService {
     return ADMINS_MESSAGES.UPDATE_CASH_FLOW_SUCCESS
   }
 
+  // Xoá dòng tiền
+  async deleteCashflow(cash_flow_id: string) {
+    await databaseService.cashFlows.deleteOne({
+      _id: new ObjectId(cash_flow_id)
+    })
+    return ADMINS_MESSAGES.DELETE_CASH_FLOW_SUCCESS
+  }
+
   // Thêm mới hạng mục theo dòng tiền
   async addCashflowCategory(payload: CashflowCategoryReqBody) {
     // Kiểm tra tồn tại của parent_id -> (sub_category)

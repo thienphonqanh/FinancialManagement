@@ -64,6 +64,7 @@ export const ADMINS_MESSAGES = {
   CASH_FLOW_PARENT_CATEGORY_NOT_FOUND: 'Không tìm thấy hạng mục cha',
   ADD_CASH_FLOW_SUCCESS: 'Thêm dòng tiền thành công',
   UPDATE_CASH_FLOW_SUCCESS: 'Cập nhật dòng tiền thành công',
+  DELETE_CASH_FLOW_SUCCESS: 'Xoá dòng tiền thành công',
   ADD_CASH_FLOW_CATEGORY_SUCCESS: 'Thêm hạng mục thành công',
   USER_IS_NOT_ADMIN: 'Bạn không có quyền này',
   MONEY_ACCOUNT_TYPE_NAME_IS_REQUIRED: 'Tên loại tài khoản được để trống',
