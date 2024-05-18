@@ -1,6 +1,5 @@
 import { Decimal128, ObjectId } from 'mongodb'
 import databaseService from './database.services'
-import { config } from 'dotenv'
 import CashFlowCategory, { CashFlowCategoryType } from '~/models/schemas/CashFlowCategory.schemas'
 import CashFlowSubCategory, { CashFlowSubCategoryType } from '~/models/schemas/CashFlowSubCategory.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
@@ -12,8 +11,6 @@ import {
   UpdateMoneyAccountReqBody
 } from '~/models/requests/App.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
-
-config()
 
 interface CashFlowCategoryResponseType {
   parent_category: CashFlowCategoryType
