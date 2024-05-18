@@ -3,6 +3,14 @@ import { ObjectId } from 'mongodb'
 export interface CashflowReqBody {
   icon: string
   name: string
+  isChosen: number
+}
+
+export interface UpdateCashflowReqBody {
+  cash_flow_id: ObjectId
+  icon: string
+  name: string
+  isChosen?: number
 }
 
 export interface CashflowCategoryReqBody {

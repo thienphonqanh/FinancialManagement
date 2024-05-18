@@ -2,12 +2,14 @@ import { Router } from 'express'
 import {
   addCashflowCategoryController,
   addCashFlowController,
-  addMoneyAccountTypeController
+  addMoneyAccountTypeController,
+  updateCashFlowController
 } from '~/controllers/admins.controllers'
 import {
   cashFlowCategoryValidator,
   cashFlowValidator,
-  moneyAccountTypeValidator
+  moneyAccountTypeValidator,
+  updateCashFlowValidator
 } from '~/middlewares/admins.middlewares'
 import { accessTokenValidator, userRoleValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -28,6 +30,22 @@ adminsRouter.post(
   verifiedUserValidator,
   cashFlowValidator,
   wrapRequestHandler(addCashFlowController)
+)
+
+/**
+ * Description. Update cash flow
+ * Path: /update-cash-flow
+ * Method: PATCH
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: { cash_flow_id: string (ObjectId), CashFlowSchema }
+ */
+adminsRouter.patch(
+  '/update-cash-flow',
+  accessTokenValidator,
+  userRoleValidator,
+  verifiedUserValidator,
+  updateCashFlowValidator,
+  wrapRequestHandler(updateCashFlowController)
 )
 
 /**

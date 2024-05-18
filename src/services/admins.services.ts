@@ -5,17 +5,39 @@ import { ADMINS_MESSAGES } from '~/constants/messages'
 import CashFlow from '~/models/schemas/CashFlow.schemas'
 import CashFlowSubCategory from '~/models/schemas/CashFlowSubCategory.schemas'
 import MoneyAccountType from '~/models/schemas/MoneyAccountType.schemas'
-import { CashflowCategoryReqBody, CashflowReqBody, MoneyAccountTypeReqBody } from '~/models/requests/Admin.requests'
+import {
+  CashflowCategoryReqBody,
+  CashflowReqBody,
+  MoneyAccountTypeReqBody,
+  UpdateCashflowReqBody
+} from '~/models/requests/Admin.requests'
 import { CashFlowType } from '~/constants/enums'
 class AdminsService {
   // Thêm mới dòng tiền
   async addCashflow(payload: CashflowReqBody) {
+    if (payload.isChosen !== undefined) {
+      payload.isChosen = parseInt(payload.isChosen.toString())
+    }
     const cashFlow = new CashFlow({
-      icon: payload.icon,
-      name: payload.name
+      ...payload
     })
     await databaseService.cashFlows.insertOne(cashFlow)
     return ADMINS_MESSAGES.ADD_CASH_FLOW_SUCCESS
+  }
+  // Update dòng tiền
+  async updateCashflow(payload: UpdateCashflowReqBody) {
+    if (payload.isChosen !== undefined) {
+      payload.isChosen = parseInt(payload.isChosen.toString())
+    }
+    await databaseService.cashFlows.updateOne({ _id: new ObjectId(payload.cash_flow_id) }, [
+      {
+        $set: {
+          ...payload,
+          updated_at: '$$NOW'
+        }
+      }
+    ])
+    return ADMINS_MESSAGES.UPDATE_CASH_FLOW_SUCCESS
   }
 
   // Thêm mới hạng mục theo dòng tiền

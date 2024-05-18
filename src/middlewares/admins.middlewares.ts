@@ -13,29 +13,97 @@ const iconSchema: ParamSchema = {
   }
 }
 
+const cashFlowNameSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: ADMINS_MESSAGES.CASH_FLOW_NAME_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: ADMINS_MESSAGES.CASH_FLOW_NAME_MUST_BE_A_STRING
+  },
+  trim: true,
+  custom: {
+    options: async (value, { req }) => {
+      /*
+        Nếu tồn tại cash_flow_id trong req.body
+        -> Đang update dòng tiền (cash_flow)
+        -> Kiểm tra tên mới có trùng với tên cũ không
+        -> Trùng thì cho phép vì tương đương không có thay đổi gì
+      */
+      if (req.body.cash_flow_id !== undefined) {
+        if (!ObjectId.isValid(req.body.cash_flow_id as string)) {
+          throw new Error(ADMINS_MESSAGES.CASH_FLOW_NOT_FOUND)
+        }
+        const existName = await databaseService.cashFlows.findOne(
+          {
+            _id: new ObjectId(req.body.cash_flow_id as string)
+          },
+          { projection: { name: 1 } }
+        )
+        if (existName === null) {
+          throw new Error(ADMINS_MESSAGES.CASH_FLOW_NOT_FOUND)
+        }
+        if (existName.name === value) {
+          return true
+        }
+      }
+      const isExist = await databaseService.cashFlows.findOne({ name: value })
+      if (isExist !== null) {
+        throw new Error(ADMINS_MESSAGES.CASH_FLOW_NAME_IS_EXIST)
+      }
+      return true
+    }
+  }
+}
+
+const isChosenSchema: ParamSchema = {
+  optional: true,
+  isNumeric: {
+    errorMessage: ADMINS_MESSAGES.CHOOSE_OR_NOT_MUST_BE_A_NUMBER
+  },
+  custom: {
+    options: (value) => {
+      // Kiểm tra nằm ngoài 0 và 1
+      if (value < 0 || value > 1) {
+        throw new Error(ADMINS_MESSAGES.CHOOSE_OR_NOT_MUST_BE_0_OR_1)
+      }
+      return true
+    }
+  }
+}
+
 // Validator cho thêm dòng tiền (addCashFlow)
 export const cashFlowValidator = validate(
   checkSchema(
     {
-      name: {
-        notEmpty: {
-          errorMessage: ADMINS_MESSAGES.CASH_FLOW_NAME_IS_REQUIRED
-        },
-        isString: {
-          errorMessage: ADMINS_MESSAGES.CASH_FLOW_NAME_MUST_BE_A_STRING
-        },
-        trim: true,
+      name: cashFlowNameSchema,
+      icon: iconSchema,
+      isChosen: isChosenSchema
+    },
+    ['body']
+  )
+)
+
+// Validator cho update dòng tiền (updateCashFlow)
+export const updateCashFlowValidator = validate(
+  checkSchema(
+    {
+      cash_flow_id: {
         custom: {
           options: async (value) => {
-            const isExist = await databaseService.cashFlows.findOne({ name: value })
-            if (isExist !== null) {
-              throw new Error(ADMINS_MESSAGES.CASH_FLOW_NAME_IS_EXIST)
+            if (!ObjectId.isValid(value)) {
+              throw new Error(ADMINS_MESSAGES.CASH_FLOW_NOT_FOUND)
+            }
+            const isExist = await databaseService.cashFlows.findOne({ _id: new ObjectId(value as string) })
+            if (isExist === null) {
+              throw new Error(ADMINS_MESSAGES.CASH_FLOW_NOT_FOUND)
             }
             return true
           }
         }
       },
-      icon: iconSchema
+      name: cashFlowNameSchema,
+      icon: iconSchema,
+      isChosen: isChosenSchema
     },
     ['body']
   )

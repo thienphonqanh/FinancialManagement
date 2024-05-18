@@ -81,7 +81,7 @@ appsRouter.post(
  * Path: /update-money-acccount
  * Method: PATCH
  * Header: { Authorization: Bearer <access_token> }
- * Body: { MoneyAccountSchema }
+ * Body: { money_account_id: string (ObjectId), MoneyAccountSchema }
  */
 appsRouter.patch(
   '/update-money-account',
