@@ -27,6 +27,12 @@ export const getMoneyAccountController = async (req: Request, res: Response, nex
   return res.json({ message: APP_MESSAGES.GET_MONEY_ACCOUNT_SUCCESS, result: result })
 }
 
+export const getExpenseRecordForStatisticsController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await appServices.getExpenseRecordForStatistics(user_id)
+  return res.json({ result: result })
+}
+
 export const addMoneyAccountController = async (
   req: Request<ParamsDictionary, any, MoneyAccountReqBody>,
   res: Response,

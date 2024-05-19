@@ -8,7 +8,8 @@ import {
   addExpenseRecordController,
   updateMoneyAccountController,
   deleteMoneyAccountController,
-  getInfoMoneyAccountController
+  getInfoMoneyAccountController,
+  getExpenseRecordForStatisticsController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
@@ -142,6 +143,19 @@ appsRouter.post(
   verifiedUserValidator,
   expenseRecordValidator,
   wrapRequestHandler(addExpenseRecordController)
+)
+
+/**
+ * Description: Get information of expense record for statistics
+ * Path: /expense-record-for-statistics
+ * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
+ */
+appsRouter.get(
+  '/expense-record-for-statistics',
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(getExpenseRecordForStatisticsController)
 )
 
 export default appsRouter

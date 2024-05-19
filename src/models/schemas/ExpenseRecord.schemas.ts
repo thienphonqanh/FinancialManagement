@@ -4,7 +4,6 @@ import { IncludedReport } from '~/constants/enums'
 interface ExpenseRecordType {
   _id?: ObjectId
   amount_of_money: Decimal128 // Số tiền
-  cash_flow_id: ObjectId // Dòng tiền
   cash_flow_category_id: ObjectId // Hạng mục chi tiêu
   money_account_id: ObjectId // Chọn tài khoản tiền
   user_id: ObjectId // ID người dùng
@@ -18,7 +17,7 @@ interface ExpenseRecordType {
   repayment_date?: Date // Ngày trả nợ (Optional)
   debt_collection_date?: Date // Ngày thu nợ (Optional)
   cost_incurred?: Decimal128 // Chi phí phát sinh (Optional)
-  cost_incurred_category_id?: ObjectId | string // Hạng mục chi phí phát sinh (Required nếu có chọn chi phí phát sinh)
+  cost_incurred_category_id?: ObjectId // Hạng mục chi phí phát sinh (Required nếu có chọn chi phí phát sinh)
   proof_image?: string // Hình ảnh chứng minh (Optional)
   created_at?: Date
   updated_at?: Date
@@ -27,7 +26,6 @@ interface ExpenseRecordType {
 export default class ExpenseRecord {
   _id?: ObjectId
   amount_of_money: Decimal128
-  cash_flow_id: ObjectId
   cash_flow_category_id: ObjectId
   money_account_id: ObjectId
   user_id: ObjectId
@@ -50,7 +48,6 @@ export default class ExpenseRecord {
     const date = new Date()
     this._id = expenseRecordType._id || new ObjectId()
     this.amount_of_money = expenseRecordType.amount_of_money
-    this.cash_flow_id = expenseRecordType.cash_flow_id
     this.cash_flow_category_id = expenseRecordType.cash_flow_category_id
     this.money_account_id = expenseRecordType.money_account_id
     this.user_id = expenseRecordType.user_id
