@@ -335,7 +335,7 @@ class AppServices {
         - Sau khi có parent và sub, duyệt 2 vòng lặp để merge lại
           - Nếu sub có parent_id trùng với id của parent (trong mảng parent -> tức là đã có trong mảng parent) thì push vào parent)
           - Nếu không (không có trong mảng parent) thì tạo một mảng mới từ sub và push vào
-        - Revenue_money: không cần xử lý nhiều vì chỉ cần lấy ra là được
+        - Revenue_money: xử lý tương tự như spending_money
         - Tính tiền spending_money: duyệt qua từng parent và sub, tính tổng tiền của từng parent và sub
           - Tính % tiền của từng parent và sub
         - Tính tiền revenue_money: cũng tương tự như spending_money
@@ -480,39 +480,65 @@ class AppServices {
       }
     })
 
-    // Tính tổng tiền và % tiền cho thu tiền
-    let totalMoneyAllRevenueRecord: number = 0
-    revenue_money.forEach((item) => {
-      totalMoneyAllRevenueRecord += parseFloat(item.amount_of_money.toString())
-    })
-
+    const parent_revenue: ExpenseRecordForStatistics[] = []
+    const response_revenue_money: ExpenseRecordForStatistics[] = []
     await Promise.all(
       revenue_money.map(async (item) => {
-        const percentage =
-          ((parseFloat(item.amount_of_money.toString()) / totalMoneyAllRevenueRecord) * 100).toFixed(2) + '%'
-        // Để không phải thay đổi cấu trúc của ExpenseRecord, sử dụng Object.assign để thêm trường percentage vào item
-        // Object.assign bản chất là dùng để copy thuộc tính
-        Object.assign(item, { percentage })
-        const cashFlowCategories = await databaseService.cashFlowCategories.findOne(
-          {
-            _id: new ObjectId(item.cash_flow_category_id)
-          },
-          { projection: { name: 1, icon: 1 } }
-        )
+        const cashFlowCategories = await databaseService.cashFlowCategories.findOne({
+          _id: new ObjectId(item.cash_flow_category_id)
+        })
+        // Kiểm tra id là của parent hay nằm trong sub_category (là của sub)
         if (cashFlowCategories !== null) {
-          const name = cashFlowCategories.name
-          const icon = cashFlowCategories.icon
-          Object.assign(item, { name, icon })
+          // Kiểm tra xem bản ghi loại parent đã tồn tại chưa
+          if (parent_revenue) {
+            const parentIndex = parent_revenue.findIndex((parentItem) =>
+              parentItem.parent_id.equals(item.cash_flow_category_id)
+            )
+            if (parentIndex !== -1) {
+              parent_revenue[parentIndex].items.push({
+                name: cashFlowCategories.name,
+                icon: cashFlowCategories.icon,
+                ...item
+              })
+              return
+            }
+          }
+          // Thêm vào parent
+          parent_revenue.push({
+            parent_id: cashFlowCategories._id,
+            parent_name: cashFlowCategories.name,
+            parent_icon: cashFlowCategories.icon,
+            items: [{ name: cashFlowCategories.name, icon: cashFlowCategories.icon, ...item }]
+          })
         }
       })
     )
 
+    // Tính tổng tiền và % tiền cho thu tiền
+    let totalMoneyAllRevenueRecord: number = 0
+    parent_revenue.forEach((parentItem) => {
+      const totalAmount = parentItem.items.reduce(
+        (sum, item) => sum + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString()),
+        0
+      )
+      parentItem.total_money = Decimal128.fromString(totalAmount.toString())
+      totalMoneyAllRevenueRecord += totalAmount
+    })
+
+    parent_revenue.forEach((parentItem) => {
+      if (parentItem.total_money !== undefined) {
+        parentItem.percentage =
+          ((parseFloat(parentItem.total_money.toString()) / totalMoneyAllRevenueRecord) * 100).toFixed(2) + '%'
+      }
+    })
+
     // Mảng trả về
     response_spending_money.push(...parent, ...filteredSub)
+    response_revenue_money.push(...parent_revenue)
 
     return {
       spending_money: response_spending_money,
-      revenue_money: revenue_money
+      revenue_money: response_revenue_money
     }
   }
 }
