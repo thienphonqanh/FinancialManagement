@@ -378,6 +378,20 @@ class AppServices {
         // Kiểm tra id là của parent hay nằm trong sub_category (là của sub)
         if (cashFlowCategories !== null) {
           if (cashFlowCategories._id.equals(item.cash_flow_category_id)) {
+            // Kiểm tra xem bản ghi loại parent đã tồn tại chưa
+            if (parent) {
+              const parentIndex = parent.findIndex((parentItem) =>
+                parentItem.parent_id.equals(item.cash_flow_category_id)
+              )
+              if (parentIndex !== -1) {
+                parent[parentIndex].items.push({
+                  name: cashFlowCategories.name,
+                  icon: cashFlowCategories.icon,
+                  ...item
+                })
+                return
+              }
+            }
             // Thêm vào parent
             parent.push({
               parent_id: cashFlowCategories._id,
@@ -391,6 +405,16 @@ class AppServices {
               sub._id.equals(item.cash_flow_category_id)
             )
             if (subCategory) {
+              // Kiểm tra xem parent của sub đã tồn tại chưa -> nếu chưa thì thêm vào
+              const checkParent = parent.find((parentItem) => parentItem.parent_id.equals(cashFlowCategories._id))
+              if (checkParent === undefined) {
+                parent.push({
+                  parent_id: cashFlowCategories._id,
+                  parent_name: cashFlowCategories.name,
+                  parent_icon: cashFlowCategories.icon,
+                  items: []
+                })
+              }
               // Thêm vào sub
               sub.push({
                 parent_id: cashFlowCategories._id,
@@ -422,7 +446,6 @@ class AppServices {
     const mergedParentIds = new Set(parent.map((item) => item.parent_id.toString()))
     // Tạo một mảng chứa các phần tử từ sub mà parent_id của chúng không nằm trong mergedParentIds
     const filteredSub = sub.filter((subItem) => !mergedParentIds.has(subItem.parent_id.toString()))
-
     // Tính tổng tiền và % tiền cho chi tiêu
     let totalMoneyAllSpendingRecord: number = 0
     parent.forEach((parentItem) => {
@@ -468,6 +491,7 @@ class AppServices {
         const percentage =
           ((parseFloat(item.amount_of_money.toString()) / totalMoneyAllRevenueRecord) * 100).toFixed(2) + '%'
         // Để không phải thay đổi cấu trúc của ExpenseRecord, sử dụng Object.assign để thêm trường percentage vào item
+        // Object.assign bản chất là dùng để copy thuộc tính
         Object.assign(item, { percentage })
         const cashFlowCategories = await databaseService.cashFlowCategories.findOne(
           {
@@ -475,7 +499,6 @@ class AppServices {
           },
           { projection: { name: 1, icon: 1 } }
         )
-
         if (cashFlowCategories !== null) {
           const name = cashFlowCategories.name
           const icon = cashFlowCategories.icon
