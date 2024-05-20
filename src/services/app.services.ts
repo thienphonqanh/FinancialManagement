@@ -21,9 +21,10 @@ interface CashFlowCategoryResponseType {
 interface ExpenseRecordForStatistics {
   parent_id: ObjectId
   parent_name: string
+  parent_icon: string
   total_money?: Decimal128
   percentage?: string
-  items: (ExpenseRecord & { name: string })[]
+  items: (ExpenseRecord & { name: string; icon: string })[]
 }
 
 class AppServices {
@@ -381,7 +382,8 @@ class AppServices {
             parent.push({
               parent_id: cashFlowCategories._id,
               parent_name: cashFlowCategories.name,
-              items: [{ name: cashFlowCategories.name, ...item }]
+              parent_icon: cashFlowCategories.icon,
+              items: [{ name: cashFlowCategories.name, icon: cashFlowCategories.icon, ...item }]
             })
           } else if (cashFlowCategories.sub_category) {
             // Tìm sub_category
@@ -393,7 +395,14 @@ class AppServices {
               sub.push({
                 parent_id: cashFlowCategories._id,
                 parent_name: cashFlowCategories.name,
-                items: [{ name: (subCategory as CashFlowSubCategory).name, ...item }]
+                parent_icon: cashFlowCategories.icon,
+                items: [
+                  {
+                    name: (subCategory as CashFlowSubCategory).name,
+                    icon: (subCategory as CashFlowSubCategory).icon,
+                    ...item
+                  }
+                ]
               })
             }
           }
@@ -454,11 +463,26 @@ class AppServices {
       totalMoneyAllRevenueRecord += parseFloat(item.amount_of_money.toString())
     })
 
-    revenue_money.forEach((item) => {
-      const percentage =
-        ((parseFloat(item.amount_of_money.toString()) / totalMoneyAllRevenueRecord) * 100).toFixed(2) + '%'
-      Object.assign(item, { percentage })
-    })
+    await Promise.all(
+      revenue_money.map(async (item) => {
+        const percentage =
+          ((parseFloat(item.amount_of_money.toString()) / totalMoneyAllRevenueRecord) * 100).toFixed(2) + '%'
+        // Để không phải thay đổi cấu trúc của ExpenseRecord, sử dụng Object.assign để thêm trường percentage vào item
+        Object.assign(item, { percentage })
+        const cashFlowCategories = await databaseService.cashFlowCategories.findOne(
+          {
+            _id: new ObjectId(item.cash_flow_category_id)
+          },
+          { projection: { name: 1, icon: 1 } }
+        )
+
+        if (cashFlowCategories !== null) {
+          const name = cashFlowCategories.name
+          const icon = cashFlowCategories.icon
+          Object.assign(item, { name, icon })
+        }
+      })
+    )
 
     // Mảng trả về
     response_spending_money.push(...parent, ...filteredSub)
