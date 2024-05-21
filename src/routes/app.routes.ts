@@ -9,13 +9,15 @@ import {
   updateMoneyAccountController,
   deleteMoneyAccountController,
   getInfoMoneyAccountController,
-  getExpenseRecordForStatisticsController
+  getExpenseRecordForStatisticsController,
+  getExpenseRecordOfEachMoneyAccountController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
   expenseRecordValidator,
   updateMoneyAccountValidator,
-  getInfoMoneyAccountValidator
+  getInfoMoneyAccountValidator,
+  getExpenseRecordOfEachMoneyAccountValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -156,6 +158,21 @@ appsRouter.get(
   accessTokenValidator,
   verifiedUserValidator,
   wrapRequestHandler(getExpenseRecordForStatisticsController)
+)
+
+/**
+ * Description: Get information of expense record of each money account (filter over time)
+ * Path: /expense-record/:money_account_id/:time
+ * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
+ * Params: { money_account_id: string (ObjectId), time: string (get all: all, get by month: mm-yyyy) }
+ */
+appsRouter.get(
+  '/expense-record/:money_account_id/:time',
+  accessTokenValidator,
+  verifiedUserValidator,
+  getExpenseRecordOfEachMoneyAccountValidator,
+  wrapRequestHandler(getExpenseRecordOfEachMoneyAccountController)
 )
 
 export default appsRouter

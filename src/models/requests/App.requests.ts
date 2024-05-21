@@ -1,5 +1,5 @@
 import { Decimal128, ObjectId } from 'mongodb'
-
+import { ParamsDictionary } from 'express-serve-static-core'
 export interface MoneyAccountReqBody {
   name: string
   account_balance: string
@@ -48,4 +48,9 @@ export interface ExpenseRecordReqBody {
   debtor?: string
   debt_collection_date?: Date
   proof_image?: string
+}
+
+export interface ExpenseRecordOfEachMoneyAccountReqParams extends ParamsDictionary {
+  money_account_id: string
+  time: string
 }

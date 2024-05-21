@@ -119,6 +119,11 @@ export const APP_MESSAGES = {
   MONEY_ACCOUNT_ID_IS_REQUIRED: 'Tài khoản tiền là bắt buộc',
   MONEY_ACCOUNT_ID_MUST_BE_A_STRING: 'Tài khoản tiền phải là chuỗi',
   MONEY_ACCOUNT_NOT_FOUND: 'Tài khoản tiền không hợp lệ',
+  TIME_TO_GET_EXPENSE_RECORD_MUST_BE_A_STRING: 'Thời gian lấy bản ghi chi tiêu phải là chuỗi',
+  TIME_TO_GET_EXPENSE_RECORD_IS_REQUIRED: 'Thời gian lấy bản ghi chi tiêu là bắt buộc',
+  MONTH_MUST_BE_BETWEEN_1_AND_12: 'Tháng phải từ 1 đến 12',
+  YEAR_MUST_BE_GREATER_THAN_2000: 'Năm phải từ 1900 trở đi',
+  TIME_IS_NOT_FOUND: 'Thời gian không hợp lệ',
   SELECT_BANK_MUST_BELONG_TO_TYPE_BANK: 'Không phải loại tài khoản ngân hàng thi không được chọn ngân hàng',
   CREDIT_LIMIT_NUMBER_MUST_BELONG_TO_TYPE_CREDIT_CARD:
     'Không phải loại thẻ tín dụng thi không được có hạn mức tín dụng',
