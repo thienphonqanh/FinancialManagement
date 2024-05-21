@@ -30,7 +30,12 @@ interface ExpenseRecordForStatistics {
 
 interface ExpenseRecordOfEachMoneyAccount {
   date: string
-  record: ExpenseRecord[]
+  total_money: Decimal128
+  records: ExpenseRecord[]
+}
+
+interface ExpenseRecordWithCashFlowType extends ExpenseRecord {
+  cash_flow_type?: number
 }
 
 class AppServices {
@@ -549,7 +554,7 @@ class AppServices {
   }
 
   async getExpenseRecordOfEachMoneyAccount(user_id: string, payload: ExpenseRecordOfEachMoneyAccountReqParams) {
-    let result: WithId<ExpenseRecord>[] = []
+    let result: WithId<ExpenseRecordWithCashFlowType>[] = []
     // Kiểm tra nếu all thì lấy hết không theo time
     if (payload.time === 'all') {
       result = await databaseService.expenseRecords
@@ -615,10 +620,13 @@ class AppServices {
         }
       })
     )
+
     // Khởi tạo Map để chứa các bản ghi chi tiêu theo ngày
-    const expenseRecordMap = new Map<string, ExpenseRecord[]>()
+    const expenseRecordMap = new Map<string, ExpenseRecordWithCashFlowType[]>()
     // Khởi tạo mảng trả về
     const response_expense_record: ExpenseRecordOfEachMoneyAccount[] = []
+    let totalMoneySpending: number = 0
+    let totalMoneyRevenue: number = 0
     // Lặp để set key cho Map là ngày và value là mảng các bản ghi chi tiêu
     result.forEach((item) => {
       /* 
@@ -634,13 +642,33 @@ class AppServices {
       } else {
         expenseRecordMap.set(key, [item])
       }
+      // Tính toán tổng chi tổng thu theo loại (0 - 1)
+      if (item.cash_flow_type === 0) {
+        totalMoneySpending =
+          totalMoneySpending + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString())
+      } else if (item.cash_flow_type === 1) {
+        totalMoneyRevenue =
+          totalMoneyRevenue + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString())
+      }
     })
     // Duyệt qua Map để push vào mảng trả về
     expenseRecordMap.forEach((value, key) => {
-      response_expense_record.push({ date: key, record: value })
+      response_expense_record.push({ date: key, total_money: new Decimal128('0'), records: value })
+    })
+    // Tính tổng tiền và thêm vào mảng
+    response_expense_record.forEach((item) => {
+      const totalAmount = item.records.reduce(
+        (sum, item) => sum + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString()),
+        0
+      )
+      item.total_money = Decimal128.fromString(totalAmount.toString())
     })
 
-    return response_expense_record
+    // Chuyển tổng tiền chi tiêu và thu nhập thành Decimal128
+    const response_spending_money = new Decimal128(totalMoneySpending.toString())
+    const response_revenue_money = new Decimal128(totalMoneyRevenue.toString())
+
+    return { response_expense_record, response_spending_money, response_revenue_money }
   }
 }
 
