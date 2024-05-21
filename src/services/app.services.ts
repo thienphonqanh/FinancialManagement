@@ -8,6 +8,7 @@ import {
   DeleteMoneyAccountReqBody,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
+  HistoryOfExpenseRecordReqParams,
   MoneyAccountReqBody,
   UpdateMoneyAccountReqBody
 } from '~/models/requests/App.requests'
@@ -715,7 +716,129 @@ class AppServices {
     const response_spending_money = new Decimal128(totalMoneySpending.toString())
     const response_revenue_money = new Decimal128(totalMoneyRevenue.toString())
     /*
-      Dùng hảm sort sắp xếp giam dần theo ngày
+      Dùng hàm sort sắp xếp giảm dần theo ngày
+      Nếu giá trị trả về < 0, phần tử a sẽ đứng trước phần tử b
+      Nếu giá trị trả về > 0, phần tử b sẽ đứng trước phần tử a
+      Nếu giá trị trả về = 0, thứ tự của a và b không thay đổi
+    */
+    response_expense_record.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return { response_expense_record, response_spending_money, response_revenue_money }
+  }
+
+  async getHistoryOfExpenseRecord(user_id: string, payload: HistoryOfExpenseRecordReqParams) {
+    let result: WithId<ExpenseRecordWithCashFlowType>[] = []
+    // Kiểm tra nếu all thì lấy hết không theo time
+    if (payload.time === 'all') {
+      result = await databaseService.expenseRecords
+        .find({
+          user_id: new ObjectId(user_id)
+        })
+        .toArray()
+    } else {
+      // Lấy tháng và năm từ time và chuyển thành dạng số với map(Number)
+      const [month, year] = payload.time.split('-').map(Number)
+      /*
+        Date.UTC đảm bảo rằng ngày được tạo theo giờ phối hợp quốc tế (UTC) để tránh các vấn đề liên quan đến múi giờ
+          - month - 1: chỉ mục tháng JS bắt đầu từ 0 -> trừ 1 để được tháng chính xác
+          - 1: ngày đầu tiên của tháng
+          - 0, 0, 0: giờ, phút và giây được đặt thành 0
+          - Tương tự endDate nhưng lấy ngày cuối cùng của tháng 23, 59, 59 -> 11:59:59 PM và 999 milliseconds
+      */
+      const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0))
+      const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
+
+      result = await databaseService.expenseRecords
+        .find({
+          user_id: new ObjectId(user_id),
+          // Lấy các bản ghi trong khoảng thời gian startDate và endDate ($lte: less than or equal, $gte: greater than or equal)
+          occur_date: { $gte: new Date(startDate), $lte: new Date(endDate) }
+        })
+        .toArray()
+    }
+
+    await Promise.all(
+      result.map(async (item) => {
+        const cashFlowCategories = await databaseService.cashFlowCategories.findOne({
+          $or: [
+            { _id: new ObjectId(item.cash_flow_category_id) },
+            { 'sub_category._id': new ObjectId(item.cash_flow_category_id) }
+          ]
+        })
+
+        if (cashFlowCategories !== null) {
+          if (cashFlowCategories._id.equals(item.cash_flow_category_id)) {
+            Object.assign(item, {
+              icon: cashFlowCategories.icon,
+              name: cashFlowCategories.name,
+              cash_flow_type: cashFlowCategories.cash_flow_type,
+              cash_flow_id: cashFlowCategories.cash_flow_id
+            })
+          } else if (cashFlowCategories.sub_category) {
+            // Tìm sub_category
+            const subCategory = cashFlowCategories.sub_category.find((sub: CashFlowSubCategory) =>
+              sub._id.equals(item.cash_flow_category_id)
+            )
+            if (subCategory) {
+              Object.assign(item, {
+                icon: (subCategory as CashFlowSubCategory).icon,
+                name: (subCategory as CashFlowSubCategory).name,
+                cash_flow_type: cashFlowCategories.cash_flow_type,
+                cash_flow_id: cashFlowCategories.cash_flow_id
+              })
+            }
+          }
+        }
+      })
+    )
+
+    // Khởi tạo Map để chứa các bản ghi chi tiêu theo ngày
+    const expenseRecordMap = new Map<string, ExpenseRecordWithCashFlowType[]>()
+    // Khởi tạo mảng trả về
+    const response_expense_record: ExpenseRecordOfEachMoneyAccount[] = []
+    let totalMoneySpending: number = 0
+    let totalMoneyRevenue: number = 0
+    // Lặp để set key cho Map là ngày và value là mảng các bản ghi chi tiêu
+    result.forEach((item) => {
+      /* 
+        Một ISOString của ngày có dạng: 2024-09-01T08:05:13.769Z -> cắt từ T để lấy ngày và giờ
+        Sau khi split -> [ '2024-09-01', '08:05:13.769Z' ] -> lấy ngày là phần tử thứ 0
+        Kiểm tra xem Map đã có key chưa (has) 
+        -> nếu có thì push vào mảng value của key đó
+        -> nếu không thì set key và value mới
+      */
+      const [key] = item.occur_date.toISOString().split('T')
+      if (expenseRecordMap.has(key)) {
+        expenseRecordMap.get(key)?.push(item)
+      } else {
+        expenseRecordMap.set(key, [item])
+      }
+      // Tính toán tổng chi tổng thu theo loại (0 - 1)
+      if (item.cash_flow_type === 0) {
+        totalMoneySpending =
+          totalMoneySpending + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString())
+      } else if (item.cash_flow_type === 1) {
+        totalMoneyRevenue =
+          totalMoneyRevenue + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString())
+      }
+    })
+    // Duyệt qua Map để push vào mảng trả về
+    expenseRecordMap.forEach((value, key) => {
+      response_expense_record.push({ date: key, total_money: new Decimal128('0'), records: value })
+    })
+    // Tính tổng tiền và thêm vào mảng
+    response_expense_record.forEach((item) => {
+      const totalAmount = item.records.reduce(
+        (sum, item) => sum + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString()),
+        0
+      )
+      item.total_money = Decimal128.fromString(totalAmount.toString())
+    })
+
+    // Chuyển tổng tiền chi tiêu và thu nhập thành Decimal128
+    const response_spending_money = new Decimal128(totalMoneySpending.toString())
+    const response_revenue_money = new Decimal128(totalMoneyRevenue.toString())
+    /*
+      Dùng hàm sort sắp xếp giảm dần theo ngày
       Nếu giá trị trả về < 0, phần tử a sẽ đứng trước phần tử b
       Nếu giá trị trả về > 0, phần tử b sẽ đứng trước phần tử a
       Nếu giá trị trả về = 0, thứ tự của a và b không thay đổi

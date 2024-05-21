@@ -54,3 +54,7 @@ export interface ExpenseRecordOfEachMoneyAccountReqParams extends ParamsDictiona
   money_account_id: string
   time: string
 }
+
+export interface HistoryOfExpenseRecordReqParams extends ParamsDictionary {
+  time: string
+}

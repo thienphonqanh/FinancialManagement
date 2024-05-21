@@ -220,6 +220,33 @@ const dateSchema: ParamSchema = {
   }
 }
 
+const timeSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: APP_MESSAGES.TIME_TO_GET_EXPENSE_RECORD_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: APP_MESSAGES.TIME_TO_GET_EXPENSE_RECORD_MUST_BE_A_STRING
+  },
+  custom: {
+    options: (value) => {
+      if (value === 'all') {
+        return true
+      }
+      const [month, year] = value.split('-').map(Number)
+      if (isNaN(month) || isNaN(year) || month === undefined || year === undefined) {
+        throw new Error(APP_MESSAGES.TIME_IS_NOT_FOUND)
+      }
+      if (month < 1 || month > 12) {
+        throw new Error(APP_MESSAGES.MONTH_MUST_BE_BETWEEN_1_AND_12)
+      }
+      if (year < 2000) {
+        throw new Error(APP_MESSAGES.YEAR_MUST_BE_GREATER_THAN_2000)
+      }
+      return true
+    }
+  }
+}
+
 // Validator cho thêm mới tài khoản tiền
 export const moneyAccountValidator = validate(
   checkSchema(
@@ -418,32 +445,16 @@ export const getExpenseRecordOfEachMoneyAccountValidator = validate(
   checkSchema(
     {
       money_account_id: moneyAccountId,
-      time: {
-        notEmpty: {
-          errorMessage: APP_MESSAGES.TIME_TO_GET_EXPENSE_RECORD_IS_REQUIRED
-        },
-        isString: {
-          errorMessage: APP_MESSAGES.TIME_TO_GET_EXPENSE_RECORD_MUST_BE_A_STRING
-        },
-        custom: {
-          options: (value) => {
-            if (value === 'all') {
-              return true
-            }
-            const [month, year] = value.split('-').map(Number)
-            if (isNaN(month) || isNaN(year) || month === undefined || year === undefined) {
-              throw new Error(APP_MESSAGES.TIME_IS_NOT_FOUND)
-            }
-            if (month < 1 || month > 12) {
-              throw new Error(APP_MESSAGES.MONTH_MUST_BE_BETWEEN_1_AND_12)
-            }
-            if (year < 2000) {
-              throw new Error(APP_MESSAGES.YEAR_MUST_BE_GREATER_THAN_2000)
-            }
-            return true
-          }
-        }
-      }
+      time: timeSchema
+    },
+    ['params']
+  )
+)
+
+export const getHistoryOfExpenseRecordValidator = validate(
+  checkSchema(
+    {
+      time: timeSchema
     },
     ['params']
   )
