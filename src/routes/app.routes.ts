@@ -11,7 +11,8 @@ import {
   getInfoMoneyAccountController,
   getExpenseRecordForStatisticsController,
   getExpenseRecordOfEachMoneyAccountController,
-  getHistoryOfExpenseRecordController
+  getHistoryOfExpenseRecordController,
+  deleteExpenseRecordController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
@@ -19,7 +20,8 @@ import {
   updateMoneyAccountValidator,
   getInfoMoneyAccountValidator,
   getExpenseRecordOfEachMoneyAccountValidator,
-  getHistoryOfExpenseRecordValidator
+  getHistoryOfExpenseRecordValidator,
+  deleteExpenseRecordValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -147,6 +149,21 @@ appsRouter.post(
   verifiedUserValidator,
   expenseRecordValidator,
   wrapRequestHandler(addExpenseRecordController)
+)
+
+/**
+ * Description: Delete one record in expense record
+ * Path: /delete-expense-record/:expense_record_id'
+ * Method: DELETE
+ * Header: { Authorization: Bearer <access_token> }
+ * Params: { expense_record_id: string (ObjectId) }
+ */
+appsRouter.delete(
+  '/delete-expense-record/:expense_record_id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  deleteExpenseRecordValidator,
+  wrapRequestHandler(deleteExpenseRecordController)
 )
 
 /**

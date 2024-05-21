@@ -5,6 +5,7 @@ import CashFlowSubCategory, { CashFlowSubCategoryType } from '~/models/schemas/C
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { APP_MESSAGES } from '~/constants/messages'
 import {
+  DeleteExpenseRecordReqParams,
   DeleteMoneyAccountReqBody,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
@@ -845,6 +846,71 @@ class AppServices {
     */
     response_expense_record.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     return { response_expense_record, response_spending_money, response_revenue_money }
+  }
+
+  async deleteExpenseRecord(user_id: string, payload: DeleteExpenseRecordReqParams) {
+    /*
+      Từ payload (req.params) lấy ra expense_record_id
+      -> Tìm bản ghi chi tiêu theo expense_record_id -> amount_of_money, money_account_id, cash_flow_category_id
+      -> Kiểm tra số dư tài khoản tiền và loại chi tiêu (chi tiêu hay thu tiền)
+      -> Nếu là chi tiêu thì cộng tiền, nếu là thu tiền thì trừ tiền
+      -> Update lại số dư tài khoản tiền và xóa bản ghi chi tiêu
+    */
+    const getExpenseRecord = await databaseService.expenseRecords.findOne(
+      {
+        _id: new ObjectId(payload.expense_record_id),
+        user_id: new ObjectId(user_id)
+      },
+      { projection: { amount_of_money: 1, money_account_id: 1, cash_flow_category_id: 1 } }
+    )
+
+    if (getExpenseRecord !== null) {
+      const [checkBalance, checkCashFlowType] = await Promise.all([
+        databaseService.moneyAccounts.findOne(
+          { _id: new ObjectId(getExpenseRecord.money_account_id), user_id: new ObjectId(user_id) },
+          { projection: { account_balance: 1 } }
+        ),
+        databaseService.cashFlowCategories.findOne(
+          {
+            $or: [
+              { _id: new ObjectId(getExpenseRecord.cash_flow_category_id) },
+              { 'sub_category._id': new ObjectId(getExpenseRecord.cash_flow_category_id) }
+            ]
+          },
+          { projection: { cash_flow_type: 1 } }
+        )
+      ])
+      if (checkBalance !== null && checkCashFlowType !== null) {
+        if (checkCashFlowType.cash_flow_type === CashFlowType.Spending) {
+          checkBalance.account_balance = new Decimal128(
+            (
+              parseFloat(checkBalance.account_balance.toString()) +
+              parseFloat(getExpenseRecord.amount_of_money.toString()) +
+              parseFloat(getExpenseRecord.cost_incurred?.toString() ?? '0')
+            ).toString()
+          )
+        } else {
+          checkBalance.account_balance = new Decimal128(
+            (
+              parseFloat(checkBalance.account_balance.toString()) -
+              parseFloat(getExpenseRecord.amount_of_money.toString())
+            ).toString()
+          )
+        }
+      }
+      await Promise.all([
+        databaseService.moneyAccounts.updateOne({ _id: getExpenseRecord.money_account_id }, [
+          {
+            $set: {
+              account_balance: checkBalance?.account_balance,
+              updated_at: '$$NOW'
+            }
+          }
+        ]),
+        databaseService.expenseRecords.deleteOne({ _id: new ObjectId(payload.expense_record_id) })
+      ])
+    }
+    return APP_MESSAGES.DELETE_EXPENSE_RECORD_SUCCESS
   }
 }
 
