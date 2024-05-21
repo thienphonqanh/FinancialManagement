@@ -274,9 +274,12 @@ export const expenseRecordValidator = validate(
           errorMessage: APP_MESSAGES.COST_INCURRED_MUST_BE_A_NUMBER
         },
         custom: {
-          options: (value) => {
+          options: (value, { req }) => {
             if (value < 0) {
               throw new Error(APP_MESSAGES.COST_INCURRED_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0)
+            }
+            if (req.body.cost_incurred_category_id === undefined) {
+              throw new Error(APP_MESSAGES.COST_INCURRED_CATEGORY_ID_IS_REQUIRED)
             }
             return true
           }

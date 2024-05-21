@@ -106,6 +106,7 @@ export const APP_MESSAGES = {
   COST_INCURRED_MUST_BE_A_NUMBER: 'Chi phí phát sinh phải là số',
   COST_INCURRED_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0: 'Chi phí phát sinh phải lớn hơn hoặc bằng 0',
   COST_INCURRED_MUST_BELONG_TO_SPENDING: 'Chi phí phát sinh phải thuộc về chi tiền',
+  COST_INCURRED_CATEGORY_ID_IS_REQUIRED: 'Hạng mục cho chi phí phát sinh là bắt buộc',
   PAY_FOR_WHO_MUST_BE_A_STRING: 'Chi cho ai phải là chuỗi',
   PAY_FOR_WHO_MUST_BELONG_TO_SPENDING: 'Chi cho ai phải thuộc về chi tiền',
   COLLECT_FROM_WHO_MUST_BELONG_TO_REVENUE: 'Thu từ ai phải thuộc về thu tiền',

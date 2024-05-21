@@ -186,7 +186,53 @@ class AppServices {
       money_account_id: new ObjectId(payload.money_account_id),
       cost_incurred: new Decimal128(payload.cost_incurred || '0')
     })
-    await databaseService.expenseRecords.insertOne(expenseRecord)
+    // Kiểm tra số dư tài khoản tiền và loại chi tiêu
+    const [checkBalance, checkCashFlowType] = await Promise.all([
+      databaseService.moneyAccounts.findOne(
+        { _id: new ObjectId(payload.money_account_id) },
+        { projection: { account_balance: 1 } }
+      ),
+      databaseService.cashFlowCategories.findOne(
+        {
+          $or: [
+            { _id: new ObjectId(payload.cash_flow_category_id) },
+            { 'sub_category._id': new ObjectId(payload.cash_flow_category_id) }
+          ]
+        },
+        { projection: { cash_flow_type: 1 } }
+      )
+    ])
+    // Nếu chi tiền thì trừ tiền, nếu thu tiền thì cộng tiền
+    if (checkCashFlowType !== null && checkBalance !== null) {
+      if (checkCashFlowType.cash_flow_type === CashFlowType.Spending) {
+        checkBalance.account_balance = new Decimal128(
+          (
+            parseFloat(checkBalance.account_balance.toString()) -
+            parseFloat(payload.amount_of_money.toString()) -
+            parseFloat(payload.cost_incurred?.toString() ?? '0')
+          ).toString()
+        )
+      } else {
+        checkBalance.account_balance = new Decimal128(
+          (
+            parseFloat(checkBalance.account_balance.toString()) + parseFloat(payload.amount_of_money.toString())
+          ).toString()
+        )
+      }
+    }
+    // Update lại số dư tài khoản tiền và thêm bản ghi chi tiêu
+    await Promise.all([
+      databaseService.moneyAccounts.updateOne({ _id: new ObjectId(payload.money_account_id) }, [
+        {
+          $set: {
+            account_balance: checkBalance?.account_balance,
+            updated_at: '$$NOW'
+          }
+        }
+      ]),
+      databaseService.expenseRecords.insertOne(expenseRecord)
+    ])
+
     return APP_MESSAGES.ADD_EXPENSE_RECORD_SUCCESS
   }
 
@@ -209,6 +255,7 @@ class AppServices {
         msg: APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND
       }
   }
+
   async updateMoneyAccount(payload: UpdateMoneyAccountReqBody) {
     // Chuyển report từ string sang number
     if (payload.report !== undefined && (payload.report.toString() === '0' || payload.report.toString() === '1')) {
