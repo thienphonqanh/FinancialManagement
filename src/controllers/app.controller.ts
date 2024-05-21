@@ -4,7 +4,11 @@ import appServices from '~/services/app.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { Decimal128, ObjectId } from 'mongodb'
-import { ExpenseRecordReqBody, MoneyAccountReqBody } from '~/models/requests/App.requests'
+import {
+  ExpenseRecordOfEachMoneyAccountReqParams,
+  ExpenseRecordReqBody,
+  MoneyAccountReqBody
+} from '~/models/requests/App.requests'
 
 export const getCashFlowController = async (req: Request, res: Response, next: NextFunction) => {
   const data = await appServices.getCashFlow()
@@ -30,6 +34,16 @@ export const getMoneyAccountController = async (req: Request, res: Response, nex
 export const getExpenseRecordForStatisticsController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const result = await appServices.getExpenseRecordForStatistics(user_id)
+  return res.json({ result: result })
+}
+
+export const getExpenseRecordOfEachMoneyAccountController = async (
+  req: Request<ExpenseRecordOfEachMoneyAccountReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await appServices.getExpenseRecordOfEachMoneyAccount(user_id, req.params)
   return res.json({ result: result })
 }
 

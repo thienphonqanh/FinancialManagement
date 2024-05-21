@@ -1,4 +1,4 @@
-import { Decimal128, ObjectId } from 'mongodb'
+import { Decimal128, ObjectId, WithId } from 'mongodb'
 import databaseService from './database.services'
 import CashFlowCategory, { CashFlowCategoryType } from '~/models/schemas/CashFlowCategory.schemas'
 import CashFlowSubCategory, { CashFlowSubCategoryType } from '~/models/schemas/CashFlowSubCategory.schemas'
@@ -6,6 +6,7 @@ import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { APP_MESSAGES } from '~/constants/messages'
 import {
   DeleteMoneyAccountReqBody,
+  ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
   MoneyAccountReqBody,
   UpdateMoneyAccountReqBody
@@ -25,6 +26,11 @@ interface ExpenseRecordForStatistics {
   total_money?: Decimal128
   percentage?: string
   items: (ExpenseRecord & { name: string; icon: string })[]
+}
+
+interface ExpenseRecordOfEachMoneyAccount {
+  date: string
+  record: ExpenseRecord[]
 }
 
 class AppServices {
@@ -540,6 +546,101 @@ class AppServices {
       spending_money: response_spending_money,
       revenue_money: response_revenue_money
     }
+  }
+
+  async getExpenseRecordOfEachMoneyAccount(user_id: string, payload: ExpenseRecordOfEachMoneyAccountReqParams) {
+    let result: WithId<ExpenseRecord>[] = []
+    // Kiểm tra nếu all thì lấy hết không theo time
+    if (payload.time === 'all') {
+      result = await databaseService.expenseRecords
+        .find({
+          user_id: new ObjectId(user_id),
+          money_account_id: new ObjectId(payload.money_account_id)
+        })
+        .toArray()
+    } else {
+      // Lấy tháng và năm từ time và chuyển thành dạng số với map(Number)
+      const [month, year] = payload.time.split('-').map(Number)
+      /*
+        Date.UTC đảm bảo rằng ngày được tạo theo giờ phối hợp quốc tế (UTC) để tránh các vấn đề liên quan đến múi giờ
+          - month - 1: chỉ mục tháng JS bắt đầu từ 0 -> trừ 1 để được tháng chính xác
+          - 1: ngày đầu tiên của tháng
+          - 0, 0, 0: giờ, phút và giây được đặt thành 0
+          - Tương tự endDate nhưng lấy ngày cuối cùng của tháng 23, 59, 59 -> 11:59:59 PM và 999 milliseconds
+      */
+      const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0))
+      const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
+
+      result = await databaseService.expenseRecords
+        .find({
+          user_id: new ObjectId(user_id),
+          money_account_id: new ObjectId(payload.money_account_id),
+          // Lấy các bản ghi trong khoảng thời gian startDate và endDate ($lte: less than or equal, $gte: greater than or equal)
+          occur_date: { $gte: new Date(startDate), $lte: new Date(endDate) }
+        })
+        .toArray()
+    }
+
+    await Promise.all(
+      result.map(async (item) => {
+        const cashFlowCategories = await databaseService.cashFlowCategories.findOne({
+          $or: [
+            { _id: new ObjectId(item.cash_flow_category_id) },
+            { 'sub_category._id': new ObjectId(item.cash_flow_category_id) }
+          ]
+        })
+
+        if (cashFlowCategories !== null) {
+          if (cashFlowCategories._id.equals(item.cash_flow_category_id)) {
+            Object.assign(item, {
+              icon: cashFlowCategories.icon,
+              name: cashFlowCategories.name,
+              cash_flow_type: cashFlowCategories.cash_flow_type,
+              cash_flow_id: cashFlowCategories.cash_flow_id
+            })
+          } else if (cashFlowCategories.sub_category) {
+            // Tìm sub_category
+            const subCategory = cashFlowCategories.sub_category.find((sub: CashFlowSubCategory) =>
+              sub._id.equals(item.cash_flow_category_id)
+            )
+            if (subCategory) {
+              Object.assign(item, {
+                icon: (subCategory as CashFlowSubCategory).icon,
+                name: (subCategory as CashFlowSubCategory).name,
+                cash_flow_type: cashFlowCategories.cash_flow_type,
+                cash_flow_id: cashFlowCategories.cash_flow_id
+              })
+            }
+          }
+        }
+      })
+    )
+    // Khởi tạo Map để chứa các bản ghi chi tiêu theo ngày
+    const expenseRecordMap = new Map<string, ExpenseRecord[]>()
+    // Khởi tạo mảng trả về
+    const response_expense_record: ExpenseRecordOfEachMoneyAccount[] = []
+    // Lặp để set key cho Map là ngày và value là mảng các bản ghi chi tiêu
+    result.forEach((item) => {
+      /* 
+        Một ISOString của ngày có dạng: 2024-09-01T08:05:13.769Z -> cắt từ T để lấy ngày và giờ
+        Sau khi split -> [ '2024-09-01', '08:05:13.769Z' ] -> lấy ngày là phần tử thứ 0
+        Kiểm tra xem Map đã có key chưa (has) 
+        -> nếu có thì push vào mảng value của key đó
+        -> nếu không thì set key và value mới
+      */
+      const [key] = item.occur_date.toISOString().split('T')
+      if (expenseRecordMap.has(key)) {
+        expenseRecordMap.get(key)?.push(item)
+      } else {
+        expenseRecordMap.set(key, [item])
+      }
+    })
+    // Duyệt qua Map để push vào mảng trả về
+    expenseRecordMap.forEach((value, key) => {
+      response_expense_record.push({ date: key, record: value })
+    })
+
+    return response_expense_record
   }
 }
 
