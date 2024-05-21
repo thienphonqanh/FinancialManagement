@@ -7,6 +7,7 @@ import { Decimal128, ObjectId } from 'mongodb'
 import {
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
+  HistoryOfExpenseRecordReqParams,
   MoneyAccountReqBody
 } from '~/models/requests/App.requests'
 
@@ -44,6 +45,16 @@ export const getExpenseRecordOfEachMoneyAccountController = async (
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const result = await appServices.getExpenseRecordOfEachMoneyAccount(user_id, req.params)
+  return res.json({ result: result })
+}
+
+export const getHistoryOfExpenseRecordController = async (
+  req: Request<HistoryOfExpenseRecordReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await appServices.getHistoryOfExpenseRecord(user_id, req.params)
   return res.json({ result: result })
 }
 
