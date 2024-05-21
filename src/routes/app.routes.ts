@@ -11,7 +11,8 @@ import {
   getInfoMoneyAccountController,
   getExpenseRecordForStatisticsController,
   getExpenseRecordOfEachMoneyAccountController,
-  getHistoryOfExpenseRecordController
+  getHistoryOfExpenseRecordController,
+  deleteExpenseRecordController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
@@ -19,7 +20,8 @@ import {
   updateMoneyAccountValidator,
   getInfoMoneyAccountValidator,
   getExpenseRecordOfEachMoneyAccountValidator,
-  getHistoryOfExpenseRecordValidator
+  getHistoryOfExpenseRecordValidator,
+  deleteExpenseRecordValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -150,6 +152,21 @@ appsRouter.post(
 )
 
 /**
+ * Description: Delete one record in expense record
+ * Path: /delete-expense-record/:expense_record_id'
+ * Method: DELETE
+ * Header: { Authorization: Bearer <access_token> }
+ * Params: { expense_record_id: string (ObjectId) }
+ */
+appsRouter.delete(
+  '/delete-expense-record/:expense_record_id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  deleteExpenseRecordValidator,
+  wrapRequestHandler(deleteExpenseRecordController)
+)
+
+/**
  * Description: Get information of expense record for statistics
  * Path: /expense-record-for-statistics
  * Method: GET
@@ -182,7 +199,7 @@ appsRouter.get(
  * Path: /expense-record/:time
  * Method: GET
  * Header: { Authorization: Bearer <access_token> }
- * Params: { money_account_id: string (ObjectId), time: string (get all: all, get by month: mm-yyyy) }
+ * Params: { time: string (get all: all, get by month: mm-yyyy) }
  */
 appsRouter.get(
   '/expense-record/:time',

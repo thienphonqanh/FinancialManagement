@@ -5,6 +5,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { Decimal128, ObjectId } from 'mongodb'
 import {
+  DeleteExpenseRecordReqParams,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
   HistoryOfExpenseRecordReqParams,
@@ -77,6 +78,16 @@ export const addExpenseRecordController = async (
   const { user_id } = req.decoded_authorization as TokenPayload
   req.body.user_id = new ObjectId(user_id)
   const result = await appServices.addExpenseRecord(req.body)
+  return res.json({ result })
+}
+
+export const deleteExpenseRecordController = async (
+  req: Request<DeleteExpenseRecordReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await appServices.deleteExpenseRecord(user_id, req.params)
   return res.json({ result })
 }
 

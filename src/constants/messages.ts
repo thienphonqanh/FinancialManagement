@@ -102,6 +102,9 @@ export const APP_MESSAGES = {
   EXPENSE_RECORD_AMOUNT_OF_MONEY_IS_REQUIRED: 'Số tiền ghi chép là bắt buộc',
   EXPENSE_RECORD_AMOUNT_OF_MONEY_MUST_BE_A_NUMBER: 'Số tiền ghi chép phải là số',
   EXPENSE_RECORD_AMOUNT_OF_MONEY_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0: 'Số tiền ghi chép phải lớn hơn hoặc bằng 0',
+  EXPENSE_RECORD_ID_IS_REQUIRED: 'ID bản ghi chép chi tiêu là bắt buộc',
+  EXPENSE_RECORD_ID_MUST_BE_A_STRING: 'ID bản ghi chép chi tiêu phải là chuỗi',
+  EXPENSE_RECORD_NOT_FOUND: 'ID bản ghi chép chi tiêu không hợp lệ',
   COST_INCURRED_IS_REQUIRED: 'Chi phí phát sinh là bắt buộc',
   COST_INCURRED_MUST_BE_A_NUMBER: 'Chi phí phát sinh phải là số',
   COST_INCURRED_MUST_BE_GREATER_THAN_OR_EQUAL_TO_0: 'Chi phí phát sinh phải lớn hơn hoặc bằng 0',
@@ -129,5 +132,6 @@ export const APP_MESSAGES = {
   CREDIT_LIMIT_NUMBER_MUST_BELONG_TO_TYPE_CREDIT_CARD:
     'Không phải loại thẻ tín dụng thi không được có hạn mức tín dụng',
   ADD_EXPENSE_RECORD_SUCCESS: 'Thêm mới bản ghi chi tiêu thành công',
+  DELETE_EXPENSE_RECORD_SUCCESS: 'Xoá bản ghi chi tiêu thành công',
   UPDATE_MONEY_ACCOUNT_SUCCESS: 'Sửa tài khoản tiền thành công'
 } as const

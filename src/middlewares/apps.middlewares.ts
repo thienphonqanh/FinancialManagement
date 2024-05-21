@@ -459,3 +459,32 @@ export const getHistoryOfExpenseRecordValidator = validate(
     ['params']
   )
 )
+
+export const deleteExpenseRecordValidator = validate(
+  checkSchema(
+    {
+      expense_record_id: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.EXPENSE_RECORD_ID_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: APP_MESSAGES.EXPENSE_RECORD_ID_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new Error(APP_MESSAGES.EXPENSE_RECORD_NOT_FOUND)
+            }
+            // Kiểm tra xem id giao dịch có hợp lệ không
+            const isValid = await databaseService.expenseRecords.findOne({ _id: new ObjectId(value) })
+            if (isValid === null) {
+              throw new Error(APP_MESSAGES.EXPENSE_RECORD_NOT_FOUND)
+            }
+          }
+        }
+      }
+    },
+    ['params']
+  )
+)
