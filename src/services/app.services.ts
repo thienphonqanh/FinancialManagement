@@ -714,7 +714,13 @@ class AppServices {
     // Chuyển tổng tiền chi tiêu và thu nhập thành Decimal128
     const response_spending_money = new Decimal128(totalMoneySpending.toString())
     const response_revenue_money = new Decimal128(totalMoneyRevenue.toString())
-
+    /*
+      Dùng hảm sort sắp xếp giam dần theo ngày
+      Nếu giá trị trả về < 0, phần tử a sẽ đứng trước phần tử b
+      Nếu giá trị trả về > 0, phần tử b sẽ đứng trước phần tử a
+      Nếu giá trị trả về = 0, thứ tự của a và b không thay đổi
+    */
+    response_expense_record.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     return { response_expense_record, response_spending_money, response_revenue_money }
   }
 }
