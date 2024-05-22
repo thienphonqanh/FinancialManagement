@@ -346,6 +346,10 @@ class AppServices {
       accountBalance = checkBalance.account_balance
     }
 
+    const expense_record_id = payload.expense_record_id
+    // Xoá expense_record_id khỏi payload
+    delete payload.expense_record_id
+
     await Promise.all([
       databaseService.moneyAccounts.updateOne({ _id: new ObjectId(getExpenseRecord?.money_account_id) }, [
         {
@@ -355,7 +359,7 @@ class AppServices {
           }
         }
       ]),
-      databaseService.expenseRecords.updateOne({ _id: new ObjectId(payload.expense_record_id) }, [
+      databaseService.expenseRecords.updateOne({ _id: new ObjectId(expense_record_id) }, [
         {
           $set: {
             ...payload,

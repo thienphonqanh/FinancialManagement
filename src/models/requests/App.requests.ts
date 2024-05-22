@@ -50,7 +50,7 @@ export interface ExpenseRecordReqBody {
 }
 
 export interface UpdateExpenseRecordReqBody {
-  expense_record_id: ObjectId
+  expense_record_id?: ObjectId
   amount_of_money?: Decimal128
   cash_flow_category_id?: ObjectId
   money_account_id?: ObjectId
