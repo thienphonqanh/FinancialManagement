@@ -11,6 +11,7 @@ import {
   ExpenseRecordReqBody,
   HistoryOfExpenseRecordReqParams,
   MoneyAccountReqBody,
+  UpdateExpenseRecordReqBody,
   UpdateMoneyAccountReqBody
 } from '~/models/requests/App.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
@@ -236,6 +237,135 @@ class AppServices {
     ])
 
     return APP_MESSAGES.ADD_EXPENSE_RECORD_SUCCESS
+  }
+
+  async updateExpenseRecord(payload: UpdateExpenseRecordReqBody) {
+    if (payload.report !== undefined && (payload.report.toString() === '0' || payload.report.toString() === '1')) {
+      payload.report = parseInt(payload.report.toString())
+    }
+    /*
+      Đây là bản ghi chép chi, thu
+        - Khi cập nhật lưu ý số tiền chi tiêu và số tiền chi phí phát sinh, hoặc thu tiền 
+        - Nếu có sự thay đổi về các loại tiền chi tiêu hoặc chí phí phát sinh, hoặc thu tiền 
+          -> Cập nhật lại số dư tài khoản tiền
+        - Để cập nhập lại số dư
+          - Cộng lại toàn bộ tiền chi tiêu và chi phí phát sinh vào lại tài khoản tiền (nếu là chi)
+          - Trừ toàn bộ tiền thu từ tài khoản tiền (nếu là thu)
+            -> Dù là cái nào cũng sẽ đưa số dư tài khoan tiền về mặc định (lúc chưa tạo bản ghi)
+          - Tiến hành trừ hoặc cộng số dư tài khoản tiền theo những gì đã update
+    */
+    // Tạo bién lưu số dư
+    let accountBalance: Decimal128 = new Decimal128('0')
+    // Lấy thông tin bản ghi từ expense_record_id
+    const getExpenseRecord = await databaseService.expenseRecords.findOne(
+      {
+        _id: new ObjectId(payload.expense_record_id)
+      },
+      { projection: { money_account_id: 1, amount_of_money: 1, cost_incurred: 1, cash_flow_category_id: 1 } }
+    )
+    // Nếu không truyền money_account_id (không thay đổi) -> lấy từ bản ghi cũ
+    if (payload.money_account_id === undefined) {
+      payload.money_account_id = getExpenseRecord?.money_account_id
+    }
+    // Nếu không truyền cash_flow_category_id (không thay đổi) -> lấy từ bản ghi cũ
+    if (payload.cash_flow_category_id === undefined) {
+      payload.cash_flow_category_id = getExpenseRecord?.cash_flow_category_id
+    }
+    // Lấy số dư tài khoản tiền và loại chi tiêu
+    const [checkBalance, checkCashFlowType] = await Promise.all([
+      databaseService.moneyAccounts.findOne(
+        { _id: new ObjectId(payload.money_account_id) },
+        { projection: { account_balance: 1 } }
+      ),
+      databaseService.cashFlowCategories.findOne(
+        {
+          $or: [
+            { _id: new ObjectId(payload.cash_flow_category_id) },
+            { 'sub_category._id': new ObjectId(payload.cash_flow_category_id) }
+          ]
+        },
+        { projection: { cash_flow_type: 1 } }
+      )
+    ])
+    // Nếu chi tiền thì trừ tiền, nếu thu tiền thì cộng tiền
+    if (checkCashFlowType !== null && checkBalance !== null) {
+      const oldAmount = parseFloat(getExpenseRecord?.amount_of_money.toString() || '0')
+      const newAmount = parseFloat(payload.amount_of_money?.toString() || oldAmount.toString())
+      const oldCostIncurred = parseFloat(getExpenseRecord?.cost_incurred?.toString() || '0')
+      const newCostIncurred = parseFloat(payload.cost_incurred?.toString() || oldCostIncurred.toString())
+
+      if (checkCashFlowType.cash_flow_type === CashFlowType.Spending) {
+        checkBalance.account_balance = new Decimal128(
+          (
+            parseFloat(checkBalance.account_balance.toString()) -
+            (newAmount - oldAmount) -
+            (newCostIncurred - oldCostIncurred)
+          ).toString()
+        )
+      } else {
+        checkBalance.account_balance = new Decimal128(
+          (parseFloat(checkBalance.account_balance.toString()) + (newAmount - oldAmount)).toString()
+        )
+        payload.cost_incurred = new Decimal128('0')
+      }
+      // Kiểm tra xem loại chi tiêu cũ và mới có giống nhau không
+      // Nếu không thì đang chuyển từ thu sang chi hoặc ngược lại
+      const checkOldCashFlowType = await databaseService.cashFlowCategories.findOne(
+        {
+          $or: [
+            { _id: new ObjectId(getExpenseRecord?.cash_flow_category_id) },
+            { 'sub_category._id': new ObjectId(getExpenseRecord?.cash_flow_category_id) }
+          ]
+        },
+        { projection: { cash_flow_type: 1 } }
+      )
+      // Xử lý việc chuyển loại chi tiêu
+      if (checkOldCashFlowType !== null) {
+        if (checkOldCashFlowType.cash_flow_type !== checkCashFlowType.cash_flow_type) {
+          if (
+            checkOldCashFlowType.cash_flow_type === CashFlowType.Spending &&
+            checkCashFlowType.cash_flow_type === CashFlowType.Revenue
+          ) {
+            checkBalance.account_balance = new Decimal128(
+              (parseFloat(checkBalance.account_balance.toString()) + oldAmount + oldCostIncurred + newAmount).toString()
+            )
+          } else if (
+            checkOldCashFlowType.cash_flow_type === CashFlowType.Revenue &&
+            checkCashFlowType.cash_flow_type === CashFlowType.Spending
+          ) {
+            checkBalance.account_balance = new Decimal128(
+              (
+                parseFloat(checkBalance.account_balance.toString()) -
+                oldAmount -
+                (oldCostIncurred + newAmount)
+              ).toString()
+            )
+          }
+        }
+      }
+      accountBalance = checkBalance.account_balance
+    }
+
+    await Promise.all([
+      databaseService.moneyAccounts.updateOne({ _id: new ObjectId(getExpenseRecord?.money_account_id) }, [
+        {
+          $set: {
+            account_balance: accountBalance,
+            updated_at: '$$NOW'
+          }
+        }
+      ]),
+      databaseService.expenseRecords.updateOne({ _id: new ObjectId(payload.expense_record_id) }, [
+        {
+          $set: {
+            ...payload,
+            updated_at: '$$NOW'
+          }
+        }
+      ])
+    ])
+
+    return APP_MESSAGES.UPDATE_EXPENSE_RECORD_SUCCESS
   }
 
   async deleteMoneyAccountService(payload: DeleteMoneyAccountReqBody) {
@@ -883,7 +1013,7 @@ class AppServices {
         _id: new ObjectId(payload.expense_record_id),
         user_id: new ObjectId(user_id)
       },
-      { projection: { amount_of_money: 1, money_account_id: 1, cash_flow_category_id: 1 } }
+      { projection: { amount_of_money: 1, money_account_id: 1, cash_flow_category_id: 1, cost_incurred: 1 } }
     )
 
     if (getExpenseRecord !== null) {

@@ -132,6 +132,7 @@ export const APP_MESSAGES = {
   CREDIT_LIMIT_NUMBER_MUST_BELONG_TO_TYPE_CREDIT_CARD:
     'Không phải loại thẻ tín dụng thi không được có hạn mức tín dụng',
   ADD_EXPENSE_RECORD_SUCCESS: 'Thêm mới bản ghi chi tiêu thành công',
+  UPDATE_EXPENSE_RECORD_SUCCESS: 'Sửa bản ghi chi tiêu thành công',
   DELETE_EXPENSE_RECORD_SUCCESS: 'Xoá bản ghi chi tiêu thành công',
   UPDATE_MONEY_ACCOUNT_SUCCESS: 'Sửa tài khoản tiền thành công'
 } as const
