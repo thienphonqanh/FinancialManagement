@@ -9,7 +9,8 @@ import {
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
   HistoryOfExpenseRecordReqParams,
-  MoneyAccountReqBody
+  MoneyAccountReqBody,
+  UpdateExpenseRecordReqBody
 } from '~/models/requests/App.requests'
 
 export const getCashFlowController = async (req: Request, res: Response, next: NextFunction) => {
@@ -78,6 +79,35 @@ export const addExpenseRecordController = async (
   const { user_id } = req.decoded_authorization as TokenPayload
   req.body.user_id = new ObjectId(user_id)
   const result = await appServices.addExpenseRecord(req.body)
+  return res.json({ result })
+}
+
+export const updateExpenseRecordController = async (
+  req: Request<ParamsDictionary, any, UpdateExpenseRecordReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  req.body.occur_date !== undefined ? (req.body.occur_date = new Date(req.body.occur_date)) : undefined
+  req.body.debt_collection_date !== undefined
+    ? (req.body.debt_collection_date = new Date(req.body.debt_collection_date))
+    : undefined
+  req.body.repayment_date !== undefined ? (req.body.repayment_date = new Date(req.body.repayment_date)) : undefined
+  req.body.cost_incurred_category_id !== undefined
+    ? (req.body.cost_incurred_category_id = new ObjectId(req.body.cost_incurred_category_id))
+    : undefined
+  req.body.amount_of_money !== undefined
+    ? (req.body.amount_of_money = new Decimal128(req.body.amount_of_money.toString()))
+    : undefined
+  req.body.cash_flow_category_id !== undefined
+    ? (req.body.cash_flow_category_id = new ObjectId(req.body.cash_flow_category_id))
+    : undefined
+  req.body.money_account_id !== undefined
+    ? (req.body.money_account_id = new ObjectId(req.body.money_account_id))
+    : undefined
+  req.body.cost_incurred !== undefined
+    ? (req.body.cost_incurred = new Decimal128(req.body.cost_incurred.toString()))
+    : undefined
+  const result = await appServices.updateExpenseRecord(req.body)
   return res.json({ result })
 }
 
