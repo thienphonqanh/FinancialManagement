@@ -7,6 +7,7 @@ import { APP_MESSAGES } from '~/constants/messages'
 import {
   DeleteExpenseRecordReqParams,
   DeleteMoneyAccountReqBody,
+  ExpenseRecordForStatisticsReqParams,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
   HistoryOfExpenseRecordReqParams,
@@ -504,7 +505,7 @@ class AppServices {
   }
 
   // Lấy danh sách các bản ghi chi tiêu của người dùng để thống kê
-  async getExpenseRecordForStatistics(user_id: string) {
+  async getExpenseRecordForStatistics(user_id: string, payload: ExpenseRecordForStatisticsReqParams) {
     /*
       Ý tưởng: sẽ đưa về dạng parent - sub
       - Trong response trả về sẽ chia làm 2 phần: spending_money và revenue_money
@@ -534,8 +535,33 @@ class AppServices {
           - Tính % tiền của từng parent và sub
         - Tính tiền revenue_money: cũng tương tự như spending_money
     */
-    // Lấy tất cả các bản ghi chi tiêu của user_id
-    const result = await databaseService.expenseRecords.find({ user_id: new ObjectId(user_id) }).toArray()
+    let result: WithId<ExpenseRecord>[] = []
+    if (payload.time === 'all') {
+      result = await databaseService.expenseRecords
+        .find({
+          user_id: new ObjectId(user_id)
+        })
+        .toArray()
+    } else {
+      const [month, year] = payload.time.split('-').map(Number)
+      /*
+          Date.UTC đảm bảo rằng ngày được tạo theo giờ phối hợp quốc tế (UTC) để tránh các vấn đề liên quan đến múi giờ
+            - month - 1: chỉ mục tháng JS bắt đầu từ 0 -> trừ 1 để được tháng chính xác
+            - 1: ngày đầu tiên của tháng
+            - 0, 0, 0: giờ, phút và giây được đặt thành 0
+            - Tương tự endDate nhưng lấy ngày cuối cùng của tháng 23, 59, 59 -> 11:59:59 PM và 999 milliseconds
+        */
+      const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0))
+      const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
+      // Lấy tất cả các bản ghi chi tiêu của user_id
+      result = await databaseService.expenseRecords
+        .find({
+          user_id: new ObjectId(user_id),
+          // Lấy các bản ghi trong khoảng thời gian startDate và endDate ($lte: less than or equal, $gte: greater than or equal)
+          occur_date: { $gte: new Date(startDate), $lte: new Date(endDate) }
+        })
+        .toArray()
+    }
     const spending_money: ExpenseRecord[] = [] // Chi tiền
     const revenue_money: ExpenseRecord[] = [] // Thu tiền
     // Duyệt qua từng bản ghi - dùng Promise.all để tăng hiệu suất
