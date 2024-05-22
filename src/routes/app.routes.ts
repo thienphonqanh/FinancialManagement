@@ -23,7 +23,8 @@ import {
   getExpenseRecordOfEachMoneyAccountValidator,
   getHistoryOfExpenseRecordValidator,
   deleteExpenseRecordValidator,
-  updateExpenseRecordValidator
+  updateExpenseRecordValidator,
+  getExpenseRecordForStatisticsValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -184,15 +185,17 @@ appsRouter.delete(
 )
 
 /**
- * Description: Get information of expense record for statistics
- * Path: /expense-record-for-statistics
+ * Description: Get information of expense record for statistics (filter over time)
+ * Path: /expense-record-for-statistics/:time
  * Method: GET
  * Header: { Authorization: Bearer <access_token> }
+ * Params: { time: string (get all: all, get by month: mm-yyyy) }
  */
 appsRouter.get(
-  '/expense-record-for-statistics',
+  '/expense-record-for-statistics/:time',
   accessTokenValidator,
   verifiedUserValidator,
+  getExpenseRecordForStatisticsValidator,
   wrapRequestHandler(getExpenseRecordForStatisticsController)
 )
 

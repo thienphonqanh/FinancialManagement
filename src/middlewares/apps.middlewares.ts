@@ -242,6 +242,9 @@ const timeSchema: ParamSchema = {
       if (year < 2000) {
         throw new Error(APP_MESSAGES.YEAR_MUST_BE_GREATER_THAN_2000)
       }
+      if (year > 2100) {
+        throw new Error(APP_MESSAGES.YEAR_MUST_BE_LESS_THAN_2100)
+      }
       return true
     }
   }
@@ -544,5 +547,14 @@ export const updateExpenseRecordValidator = validate(
       }
     },
     ['body']
+  )
+)
+
+export const getExpenseRecordForStatisticsValidator = validate(
+  checkSchema(
+    {
+      time: timeSchema
+    },
+    ['params']
   )
 )

@@ -80,6 +80,10 @@ export interface HistoryOfExpenseRecordReqParams extends ParamsDictionary {
   time: string
 }
 
+export interface ExpenseRecordForStatisticsReqParams extends ParamsDictionary {
+  time: string
+}
+
 export interface DeleteExpenseRecordReqParams extends ParamsDictionary {
   expense_record_id: string
 }
