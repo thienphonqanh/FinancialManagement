@@ -27,7 +27,7 @@ interface ExpenseRecordForStatistics {
   parent_icon: string
   total_money?: Decimal128
   percentage?: string
-  items: (ExpenseRecord & { name: string; icon: string })[]
+  items: (ExpenseRecord & { name: string; icon: string; cash_flow_type: number; cash_flow_id: ObjectId })[]
 }
 
 interface ExpenseRecordOfEachMoneyAccount {
@@ -447,6 +447,8 @@ class AppServices {
                 parent[parentIndex].items.push({
                   name: cashFlowCategories.name,
                   icon: cashFlowCategories.icon,
+                  cash_flow_type: cashFlowCategories.cash_flow_type,
+                  cash_flow_id: cashFlowCategories.cash_flow_id,
                   ...item
                 })
                 return
@@ -457,7 +459,15 @@ class AppServices {
               parent_id: cashFlowCategories._id,
               parent_name: cashFlowCategories.name,
               parent_icon: cashFlowCategories.icon,
-              items: [{ name: cashFlowCategories.name, icon: cashFlowCategories.icon, ...item }]
+              items: [
+                {
+                  name: cashFlowCategories.name,
+                  icon: cashFlowCategories.icon,
+                  cash_flow_type: cashFlowCategories.cash_flow_type,
+                  cash_flow_id: cashFlowCategories.cash_flow_id,
+                  ...item
+                }
+              ]
             })
           } else if (cashFlowCategories.sub_category) {
             // Tìm sub_category
@@ -484,6 +494,8 @@ class AppServices {
                   {
                     name: (subCategory as CashFlowSubCategory).name,
                     icon: (subCategory as CashFlowSubCategory).icon,
+                    cash_flow_id: cashFlowCategories.cash_flow_id,
+                    cash_flow_type: cashFlowCategories.cash_flow_type,
                     ...item
                   }
                 ]
@@ -558,6 +570,8 @@ class AppServices {
               parent_revenue[parentIndex].items.push({
                 name: cashFlowCategories.name,
                 icon: cashFlowCategories.icon,
+                cash_flow_type: cashFlowCategories.cash_flow_type,
+                cash_flow_id: cashFlowCategories.cash_flow_id,
                 ...item
               })
               return
@@ -568,7 +582,15 @@ class AppServices {
             parent_id: cashFlowCategories._id,
             parent_name: cashFlowCategories.name,
             parent_icon: cashFlowCategories.icon,
-            items: [{ name: cashFlowCategories.name, icon: cashFlowCategories.icon, ...item }]
+            items: [
+              {
+                name: cashFlowCategories.name,
+                icon: cashFlowCategories.icon,
+                cash_flow_type: cashFlowCategories.cash_flow_type,
+                cash_flow_id: cashFlowCategories.cash_flow_id,
+                ...item
+              }
+            ]
           })
         }
       })
