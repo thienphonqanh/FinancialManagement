@@ -13,7 +13,6 @@ interface UserType {
   created_at?: Date
   updated_at?: Date // Optional
   avatar?: string // Optional
-  money_account_id?: ObjectId[] // Optional
   phone?: string // Optional
   address?: string // Optional
   job?: string // Optional
@@ -33,7 +32,6 @@ export default class User {
   role: Role
   created_at: Date
   updated_at: Date // Optional
-  money_account_id: ObjectId[] // Optional
   phone: string // Optional
   address: string // Optional
   job: string // Optional
@@ -53,7 +51,6 @@ export default class User {
     this.role = user.role || Role.User
     this.created_at = user.created_at || date
     this.updated_at = user.updated_at || date
-    this.money_account_id = user.money_account_id || []
     this.phone = user.phone || ''
     this.address = user.address || ''
     this.job = user.job || ''
