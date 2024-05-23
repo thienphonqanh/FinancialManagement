@@ -1,5 +1,4 @@
 import { MongoClient, Db, Collection } from 'mongodb'
-import { config } from 'dotenv'
 import User from '~/models/schemas/User.schemas'
 import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import CashFlow from '~/models/schemas/CashFlow.schemas'
@@ -7,10 +6,9 @@ import CashFlowCategory from '~/models/schemas/CashFlowCategory.schemas'
 import RefreshToken from '~/models/schemas/Refresh.schemas'
 import MoneyAccountType from '~/models/schemas/MoneyAccountType.schemas'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
+import { envConfig } from '~/constants/configs'
 
-config()
-
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@financialmanagement.kiplzgn.mongodb.net/`
+const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@financialmanagement.kiplzgn.mongodb.net/`
 
 class DatabaseService {
   private client: MongoClient
@@ -18,7 +16,7 @@ class DatabaseService {
 
   constructor() {
     this.client = new MongoClient(uri)
-    this.db = this.client.db(process.env.DB_NAME)
+    this.db = this.client.db(envConfig.dbName)
   }
 
   async connect() {
@@ -33,31 +31,31 @@ class DatabaseService {
   }
 
   get users(): Collection<User> {
-    return this.db.collection(process.env.DB_USERS_COLLECTION as string)
+    return this.db.collection(envConfig.dbUsersCollection)
   }
 
   get refreshTokens(): Collection<RefreshToken> {
-    return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
+    return this.db.collection(envConfig.dbRefreshTokensCollection)
   }
 
   get moneyAccountTypes(): Collection<MoneyAccountType> {
-    return this.db.collection(process.env.DB_MONEY_ACCOUNT_TYPES_COLLECTION as string)
+    return this.db.collection(envConfig.dbMoneyAccountTypesCollection)
   }
 
   get moneyAccounts(): Collection<MoneyAccount> {
-    return this.db.collection(process.env.DB_MONEY_ACCOUNTS_COLLECTION as string)
+    return this.db.collection(envConfig.dbMoneyAccountsCollection)
   }
 
   get cashFlows(): Collection<CashFlow> {
-    return this.db.collection(process.env.DB_CASH_FLOWS_COLLECTION as string)
+    return this.db.collection(envConfig.dbCashFlowsCollection)
   }
 
   get cashFlowCategories(): Collection<CashFlowCategory> {
-    return this.db.collection(process.env.DB_CASH_FLOW_CATEGORIES_COLLECTION as string)
+    return this.db.collection(envConfig.dbCashFlowCategoriesCollection)
   }
 
   get expenseRecords(): Collection<ExpenseRecord> {
-    return this.db.collection(process.env.DB_EXPENSE_RECORDS_COLLECTION as string)
+    return this.db.collection(envConfig.dbExpenseRecordsCollection)
   }
 }
 
