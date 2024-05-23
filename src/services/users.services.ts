@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 import databaseService from './database.services'
 import User from '~/models/schemas/User.schemas'
-import { RegisterReqBody } from '~/models/requests/User.requests'
+import { RegisterReqBody, UpdateMeReqBody } from '~/models/requests/User.requests'
 import { hashPassword } from '~/utils/crypto'
 import { signToken, verifyToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
@@ -255,8 +255,25 @@ class UsersService {
       { _id: new ObjectId(user_id) },
       { projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 } }
     )
-
     return user
+  }
+
+  async updateMe(user_id: string, payload: UpdateMeReqBody) {
+    const _payload = payload.dob ? { ...payload, dob: new Date(payload.dob) } : payload
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          ...(_payload as UpdateMeReqBody & { dob?: Date })
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    return USERS_MESSAGES.UPDATE_ME_SUCCESS
   }
 }
 

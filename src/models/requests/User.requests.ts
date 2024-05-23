@@ -39,6 +39,15 @@ export interface RefreshTokenReqBody {
   refresh_token: string
 }
 
+export interface UpdateMeReqBody {
+  name?: string
+  dob?: string
+  address?: string
+  job?: string
+  avatar?: string
+  phone?: string
+}
+
 export interface TokenPayload extends JwtPayload {
   user_id: string
   token_type: TokenType
