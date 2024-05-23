@@ -446,7 +446,7 @@ export const updateMeValidator = validate(
         },
         custom: {
           options: (value) => {
-            if (value !== 0 && value !== 1) {
+            if (value !== '0' && value !== '1') {
               throw new Error(USERS_MESSAGES.GENDER_MUST_BE_0_OR_1)
             }
             return true
