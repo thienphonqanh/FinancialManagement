@@ -1,16 +1,15 @@
 import express from 'express'
 import { createServer } from 'http'
 import cors from 'cors'
-import { config } from 'dotenv'
 import databaseService from './services/database.services'
 import { defaultErrorHandler } from './middlewares/errors.middlewares'
 import usersRouter from './routes/users.routes'
 import adminsRouter from './routes/admins.routes'
 import { initFolder } from './utils/file'
 import appsRouter from './routes/app.routes'
-config()
+import { envConfig } from './constants/configs'
 
-const PORT = process.env.PORT
+const PORT = envConfig.port
 const app = express()
 const httpServer = createServer(app)
 

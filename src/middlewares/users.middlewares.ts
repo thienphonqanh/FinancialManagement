@@ -16,6 +16,8 @@ import { TokenPayload } from '~/models/requests/User.requests'
 import { Role, UserVerifyStatus } from '~/constants/enums'
 import User from '~/models/schemas/User.schemas'
 import { wrapRequestHandler } from '~/utils/handlers'
+import { envConfig } from '~/constants/configs'
+import { env } from 'process'
 
 const nameSchema: ParamSchema = {
   notEmpty: {
@@ -108,7 +110,7 @@ const forgotPasswordTokenSchema: ParamSchema = {
       try {
         const decoded_forgot_password_token = await verifyToken({
           token: value,
-          secretOrPublicKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
+          secretOrPublicKey: envConfig.JWTSecretForgotPasswordToken as string
         })
         const { user_id } = decoded_forgot_password_token
         const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
@@ -158,7 +160,7 @@ export const accessTokenValidator = validate(
             try {
               const decoded_authorization = await verifyToken({
                 token: access_token,
-                secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
+                secretOrPublicKey: envConfig.JWTSecretAccessToken as string
               })
 
               if (req) {
@@ -201,7 +203,7 @@ export const refreshTokenValidator = validate(
             }
             try {
               const [decoded_refresh_token, refresh_token] = await Promise.all([
-                verifyToken({ token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string }),
+                verifyToken({ token: value, secretOrPublicKey: envConfig.JWTSecretRefreshToken }),
                 databaseService.refreshTokens.findOne({ token: value })
               ])
 
@@ -304,7 +306,7 @@ export const emailVerifyTokenValidator = validate(
             try {
               const decoded_email_verify_token = await verifyToken({
                 token: value,
-                secretOrPublicKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
+                secretOrPublicKey: envConfig.JWTSecretEmailVerifyToken as string
               })
 
               if (req) {
