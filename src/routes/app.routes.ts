@@ -189,13 +189,13 @@ appsRouter.delete(
 
 /**
  * Description: Get information of expense record for statistics (filter over time)
- * Path: /expense-record-for-statistics/:time
+ * Path: /expense-record-for-statistics/:start_time?/:end_time?
  * Method: GET
  * Header: { Authorization: Bearer <access_token> }
- * Params: { time: string (get all: all, get by month: mm-yyyy) }
+ * Params: { start_time: string (Date dd-MM-yyy), end_time: string (Date dd-MM-yyy) }
  */
 appsRouter.get(
-  '/expense-record-for-statistics/:time',
+  '/expense-record-for-statistics/:start_time?/:end_time?',
   accessTokenValidator,
   verifiedUserValidator,
   getExpenseRecordForStatisticsValidator,
