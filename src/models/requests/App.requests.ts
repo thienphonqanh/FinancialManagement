@@ -87,3 +87,7 @@ export interface ExpenseRecordForStatisticsReqParams extends ParamsDictionary {
 export interface DeleteExpenseRecordReqParams extends ParamsDictionary {
   expense_record_id: string
 }
+
+export interface DeleteMoneyAccountReqParams extends ParamsDictionary {
+  money_account_id: string
+}

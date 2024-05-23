@@ -6,6 +6,7 @@ import { TokenPayload } from '~/models/requests/User.requests'
 import { Decimal128, ObjectId } from 'mongodb'
 import {
   DeleteExpenseRecordReqParams,
+  DeleteMoneyAccountReqParams,
   ExpenseRecordForStatisticsReqParams,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
@@ -154,9 +155,12 @@ export const getInfoMoneyAccountController = async (req: Request, res: Response,
   return res.json({ message: APP_MESSAGES.GET_INFORMATION_OF_MONEY_ACCOUNT_SUCCESS, result })
 }
 
-export const deleteMoneyAccountController = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteMoneyAccountController = async (
+  req: Request<DeleteMoneyAccountReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  req.body.user_id = new ObjectId(user_id)
-  const result = await appServices.deleteMoneyAccountService(req.body)
+  const result = await appServices.deleteMoneyAccount(user_id, req.params)
   return res.json({ result })
 }
