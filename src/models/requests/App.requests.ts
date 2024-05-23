@@ -81,7 +81,8 @@ export interface HistoryOfExpenseRecordReqParams extends ParamsDictionary {
 }
 
 export interface ExpenseRecordForStatisticsReqParams extends ParamsDictionary {
-  time: string
+  start_time: string
+  end_time: string
 }
 
 export interface DeleteExpenseRecordReqParams extends ParamsDictionary {

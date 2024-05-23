@@ -385,6 +385,39 @@ const costIncurredCategoryIdSchema: ParamSchema = {
   }
 }
 
+const startAndEndTimeSchema: ParamSchema = {
+  optional: true,
+  isString: {
+    errorMessage: APP_MESSAGES.TIME_TO_GET_EXPENSE_RECORD_MUST_BE_A_STRING
+  },
+  custom: {
+    options: (value, { req }) => {
+      if (req.params && req.params.end_time !== undefined) {
+        // reverse() -> đổi định dạng "DD-MM-YYYY" sang "YYYY-MM-DD"
+        const start = new Date(value.split('-').reverse().join('-'))
+        const end = new Date(req.params.end_time.split('-').reverse().join('-'))
+        if (start > end) {
+          throw new Error(APP_MESSAGES.END_TIME_MUST_BE_THE_DAY_BEHIN_START_TIME)
+        }
+      }
+      const [day, month, year] = value.split('-').map(Number)
+      if (isNaN(day) || isNaN(month) || isNaN(year) || day === undefined || month === undefined || year === undefined) {
+        throw new Error(APP_MESSAGES.TIME_IS_NOT_FOUND)
+      }
+      if (month < 1 || month > 12) {
+        throw new Error(APP_MESSAGES.MONTH_MUST_BE_BETWEEN_1_AND_12)
+      }
+      if (year < 2000) {
+        throw new Error(APP_MESSAGES.YEAR_MUST_BE_GREATER_THAN_2000)
+      }
+      if (year > 2100) {
+        throw new Error(APP_MESSAGES.YEAR_MUST_BE_LESS_THAN_2100)
+      }
+      return true
+    }
+  }
+}
+
 // Validator cho thêm mới tài khoản tiền
 export const moneyAccountValidator = validate(
   checkSchema(
@@ -553,7 +586,8 @@ export const updateExpenseRecordValidator = validate(
 export const getExpenseRecordForStatisticsValidator = validate(
   checkSchema(
     {
-      time: timeSchema
+      start_time: startAndEndTimeSchema,
+      end_time: startAndEndTimeSchema
     },
     ['params']
   )
