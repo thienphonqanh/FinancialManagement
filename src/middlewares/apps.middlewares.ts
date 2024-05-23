@@ -558,3 +558,5 @@ export const getExpenseRecordForStatisticsValidator = validate(
     ['params']
   )
 )
+
+export const deleteMoneyAccountValidator = validate(checkSchema({ money_account_id: moneyAccountId }, ['params']))

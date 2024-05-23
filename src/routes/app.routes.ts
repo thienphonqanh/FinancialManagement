@@ -24,7 +24,8 @@ import {
   getHistoryOfExpenseRecordValidator,
   deleteExpenseRecordValidator,
   updateExpenseRecordValidator,
-  getExpenseRecordForStatisticsValidator
+  getExpenseRecordForStatisticsValidator,
+  deleteMoneyAccountValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -102,15 +103,17 @@ appsRouter.patch(
 )
 
 /**
- * Description: DELETE a collection in  money account
- * Path: /app/delete-money-account
+ * Description: DELETE money account of user
+ * Path: /delete-money-account/:money_account_id
  * Method: DELETE
  * Header: { Authorization: Bearer <access_token> }
+ * Params: { money_account_id: string (ObjectId) }
  */
 appsRouter.delete(
-  '/delete-money-account',
+  '/delete-money-account/:money_account_id',
   accessTokenValidator,
   verifiedUserValidator,
+  deleteMoneyAccountValidator,
   wrapRequestHandler(deleteMoneyAccountController)
 )
 

@@ -7,6 +7,7 @@ import { APP_MESSAGES } from '~/constants/messages'
 import {
   DeleteExpenseRecordReqParams,
   DeleteMoneyAccountReqBody,
+  DeleteMoneyAccountReqParams,
   ExpenseRecordForStatisticsReqParams,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
@@ -373,24 +374,15 @@ class AppServices {
     return APP_MESSAGES.UPDATE_EXPENSE_RECORD_SUCCESS
   }
 
-  async deleteMoneyAccountService(payload: DeleteMoneyAccountReqBody) {
-    const money_account_id = payload.money_account_id
-
-    const query = {
-      _id: new ObjectId(money_account_id),
-      user_id: new ObjectId(payload.user_id)
-    }
-    const result = await databaseService.moneyAccounts.deleteOne(query)
-    if (result['deletedCount'] == 1) {
-      return {
-        deletedCount: 1,
-        msg: APP_MESSAGES.DELETE_MONEY_ACCOUNT_SUCCESS
-      }
-    } else
-      return {
-        deletedCount: 0,
-        msg: APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND
-      }
+  async deleteMoneyAccount(user_id: string, payload: DeleteMoneyAccountReqParams) {
+    await Promise.all([
+      databaseService.expenseRecords.deleteMany({
+        money_account_id: new ObjectId(payload.money_account_id),
+        user_id: new ObjectId(user_id)
+      }),
+      databaseService.moneyAccounts.deleteOne({ _id: new ObjectId(payload.money_account_id) })
+    ])
+    return APP_MESSAGES.DELETE_MONEY_ACCOUNT_SUCCESS
   }
 
   async updateMoneyAccount(payload: UpdateMoneyAccountReqBody) {
