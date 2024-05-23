@@ -391,3 +391,83 @@ export const userRoleValidator = wrapRequestHandler(async (req: Request, res: Re
   }
   next()
 })
+
+export const updateMeValidator = validate(
+  checkSchema(
+    {
+      name: {
+        ...nameSchema,
+        optional: true
+      },
+      dob: {
+        optional: true,
+        isISO8601: {
+          options: {
+            strict: true,
+            strictSeparator: true
+          },
+          errorMessage: USERS_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601
+        }
+      },
+      phone: {
+        optional: true,
+        trim: true,
+        isMobilePhone: {
+          options: ['vi-VN'],
+          errorMessage: USERS_MESSAGES.PHONE_IS_INVALID
+        }
+      },
+      address: {
+        optional: true,
+        trim: true,
+        isLength: {
+          options: {
+            min: 1,
+            max: 200
+          },
+          errorMessage: USERS_MESSAGES.LOCATION_LENGTH
+        }
+      },
+      job: {
+        optional: true,
+        trim: true,
+        isLength: {
+          options: {
+            min: 1,
+            max: 100
+          },
+          errorMessage: USERS_MESSAGES.JOB_LENGTH
+        }
+      },
+      gender: {
+        optional: true,
+        isNumeric: {
+          errorMessage: USERS_MESSAGES.GENDER_MUST_BE_NUMBER
+        },
+        custom: {
+          options: (value) => {
+            if (value !== 0 && value !== 1) {
+              throw new Error(USERS_MESSAGES.GENDER_MUST_BE_0_OR_1)
+            }
+            return true
+          }
+        }
+      },
+      avatar: {
+        optional: true,
+        isString: {
+          errorMessage: USERS_MESSAGES.IMAGE_URL_MUST_BE_STRING
+        },
+        trim: true,
+        isLength: {
+          options: {
+            min: 1,
+            max: 500
+          },
+          errorMessage: USERS_MESSAGES.IMAGE_URL_LENGTH
+        }
+      }
+    },
+    ['body']
+  )
+)

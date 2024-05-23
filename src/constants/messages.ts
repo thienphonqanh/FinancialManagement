@@ -18,7 +18,7 @@ export const USERS_MESSAGES = {
   CONFIRM_PASSWORD_MUST_BE_STRONG:
     'Mật khẩu phải từ 6 đến 50 ký tự và chứa ít nhất 1 chữ thường, 1 chữ hoa, 1 số và 1 ký tự đặc biệt',
   CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD: 'Mật khẩu không trùng khớp',
-  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be ISO8601',
+  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Ngày sinh phải là ISO8601',
   LOGIN_SUCCESS: 'Login success',
   REGISTER_SUCCESS: 'Register success',
   ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
@@ -38,7 +38,15 @@ export const USERS_MESSAGES = {
   RESET_PASSWORD_SUCCESS: 'Reset password success',
   USER_NOT_VERIFIED: 'User not verified',
   REFRESH_TOKEN_SUCCESS: 'Refresh token success',
-  GET_ME_SUCCESS: 'Lấy thông tin người dùng thành công'
+  GET_ME_SUCCESS: 'Lấy thông tin người dùng thành công',
+  UPDATE_ME_SUCCESS: 'Sửa thông tin người dùng thành công',
+  LOCATION_LENGTH: 'Độ dài địa chỉ phải từ 1 đến 200',
+  IMAGE_URL_MUST_BE_STRING: 'Đường dẫn ảnh phải là chuỗi',
+  IMAGE_URL_LENGTH: 'Độ dài đường dẫn ảnh phải từ 1 đến 500',
+  JOB_LENGTH: 'Độ dài nghề nghiệp phải từ 1 đến 100',
+  GENDER_MUST_BE_NUMBER: 'Giới tính phải là số',
+  GENDER_MUST_BE_0_OR_1: 'Giới tính phải là 0 hoặc 1',
+  PHONE_IS_INVALID: 'Số điện thoại không hợp lệ'
 } as const
 
 export const ADMINS_MESSAGES = {
