@@ -259,14 +259,19 @@ class UsersService {
   }
 
   async updateMe(user_id: string, payload: UpdateMeReqBody) {
-    const _payload = payload.dob ? { ...payload, dob: new Date(payload.dob) } : payload
+    if (payload.gender !== undefined) {
+      payload.gender = parseInt(payload.gender.toString())
+    }
+    if (payload.dob !== undefined) {
+      payload.dob = new Date(payload.dob)
+    }
     await databaseService.users.updateOne(
       {
         _id: new ObjectId(user_id)
       },
       {
         $set: {
-          ...(_payload as UpdateMeReqBody & { dob?: Date })
+          ...payload
         },
         $currentDate: {
           updated_at: true

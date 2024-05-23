@@ -41,11 +41,12 @@ export interface RefreshTokenReqBody {
 
 export interface UpdateMeReqBody {
   name?: string
-  dob?: string
+  dob?: Date
   address?: string
   job?: string
   avatar?: string
   phone?: string
+  gender?: number
 }
 
 export interface TokenPayload extends JwtPayload {
