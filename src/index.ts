@@ -8,14 +8,16 @@ import adminsRouter from './routes/admins.routes'
 import { initFolder } from './utils/file'
 import appsRouter from './routes/app.routes'
 import { envConfig } from './constants/configs'
+import helmet from 'helmet'
 
 const PORT = envConfig.port
 const app = express()
+app.use(helmet())
+app.use(cors())
 const httpServer = createServer(app)
 
 databaseService.connect()
 
-app.use(cors())
 initFolder()
 app.use(express.json()) // Kích hoạt middleware -> chuyển đổi json trong HTTP thành JS Object
 app.use('/users', usersRouter) // Route cho người dùng
