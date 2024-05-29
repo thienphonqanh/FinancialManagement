@@ -6,6 +6,7 @@ interface UserType {
   name: string
   email: string
   password: string
+  agree_policy?: number
   gender?: GenderType
   verify?: UserVerifyStatus
   dob?: Date
@@ -37,6 +38,7 @@ export default class User {
   job: string // Optional
   email_verify_token: string // Optional
   forgot_password_token: string // Optional
+  agree_policy: number
 
   constructor(user: UserType) {
     const date = new Date()
@@ -56,5 +58,6 @@ export default class User {
     this.job = user.job || ''
     this.email_verify_token = user.email_verify_token || ''
     this.forgot_password_token = user.forgot_password_token || ''
+    this.agree_policy = user.agree_policy || 0
   }
 }

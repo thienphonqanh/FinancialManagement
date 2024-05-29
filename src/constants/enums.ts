@@ -6,8 +6,7 @@ export enum UserVerifyStatus {
 
 export enum GenderType {
   Male, // Nam, mặc định = 0
-  Female, // Nữ
-  Another // Khác
+  Female // Nữ
 }
 
 export enum IncludedReport {
