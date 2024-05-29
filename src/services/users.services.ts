@@ -261,6 +261,9 @@ class UsersService {
     if (payload.gender !== undefined) {
       payload.gender = parseInt(payload.gender.toString())
     }
+    if (payload.agree_policy !== undefined) {
+      payload.agree_policy = parseInt(payload.agree_policy.toString())
+    }
     if (payload.dob !== undefined) {
       payload.dob = new Date(payload.dob)
     }

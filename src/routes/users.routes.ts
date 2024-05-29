@@ -128,7 +128,7 @@ usersRouter.patch(
   accessTokenValidator,
   verifiedUserValidator,
   updateMeValidator,
-  filterMiddleware<UpdateMeReqBody>(['name', 'dob', 'address', 'job', 'avatar', 'phone', 'gender']),
+  filterMiddleware<UpdateMeReqBody>(['name', 'dob', 'address', 'job', 'avatar', 'phone', 'gender', 'agree_policy']),
   wrapRequestHandler(updateMeController)
 )
 

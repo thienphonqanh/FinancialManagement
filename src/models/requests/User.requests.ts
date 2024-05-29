@@ -47,6 +47,7 @@ export interface UpdateMeReqBody {
   avatar?: string
   phone?: string
   gender?: number
+  agree_policy?: number
 }
 
 export interface TokenPayload extends JwtPayload {
