@@ -46,6 +46,8 @@ export const USERS_MESSAGES = {
   JOB_LENGTH: 'Độ dài nghề nghiệp phải từ 1 đến 100',
   GENDER_MUST_BE_NUMBER: 'Giới tính phải là số',
   GENDER_MUST_BE_0_OR_1: 'Giới tính phải là 0 hoặc 1',
+  AGREE_TO_THE_POLICY_MUST_BE_NUMBER: 'Đồng ý với chính sách phải là số',
+  AGREE_TO_THE_POLICY_MUST_BE_0_OR_1: 'Đồng ý với chính sách phải là 0 hoặc 1',
   PHONE_IS_INVALID: 'Số điện thoại không hợp lệ'
 } as const
 

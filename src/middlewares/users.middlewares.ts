@@ -455,6 +455,20 @@ export const updateMeValidator = validate(
           }
         }
       },
+      agree_policy: {
+        optional: true,
+        isNumeric: {
+          errorMessage: USERS_MESSAGES.AGREE_TO_THE_POLICY_MUST_BE_NUMBER
+        },
+        custom: {
+          options: (value) => {
+            if (value !== '0' && value !== '1') {
+              throw new Error(USERS_MESSAGES.AGREE_TO_THE_POLICY_MUST_BE_0_OR_1)
+            }
+            return true
+          }
+        }
+      },
       avatar: {
         optional: true,
         isString: {
