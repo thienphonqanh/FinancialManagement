@@ -404,6 +404,9 @@ const startAndEndTimeSchema: ParamSchema = {
       if (isNaN(day) || isNaN(month) || isNaN(year) || day === undefined || month === undefined || year === undefined) {
         throw new Error(APP_MESSAGES.TIME_IS_NOT_FOUND)
       }
+      if (day < 1 || day > 31) {
+        throw new Error(APP_MESSAGES.DAY_MUST_BE_BETWEEN_1_AND_31)
+      }
       if (month < 1 || month > 12) {
         throw new Error(APP_MESSAGES.MONTH_MUST_BE_BETWEEN_1_AND_12)
       }
@@ -511,7 +514,8 @@ export const getExpenseRecordOfEachMoneyAccountValidator = validate(
   checkSchema(
     {
       money_account_id: moneyAccountId,
-      time: timeSchema
+      start_time: startAndEndTimeSchema,
+      end_time: startAndEndTimeSchema
     },
     ['params']
   )
@@ -520,7 +524,8 @@ export const getExpenseRecordOfEachMoneyAccountValidator = validate(
 export const getHistoryOfExpenseRecordValidator = validate(
   checkSchema(
     {
-      time: timeSchema
+      start_time: startAndEndTimeSchema,
+      end_time: startAndEndTimeSchema
     },
     ['params']
   )

@@ -204,13 +204,14 @@ appsRouter.get(
 
 /**
  * Description: Get information of expense record of each money account (filter over time)
- * Path: /expense-record/:money_account_id/:time
+ * Path: /expense-record/money-account/:money_account_id/:start_time?/:end_time?
  * Method: GET
  * Header: { Authorization: Bearer <access_token> }
- * Params: { money_account_id: string (ObjectId), time: string (get all: all, get by month: mm-yyyy) }
+ * Params: { money_account_id: string (ObjectId),
+ * start_time: string (Date dd-MM-yyy), end_time: string (Date dd-MM-yyy) }
  */
 appsRouter.get(
-  '/expense-record/:money_account_id/:time',
+  '/expense-record/money-account/:money_account_id/:start_time?/:end_time?',
   accessTokenValidator,
   verifiedUserValidator,
   getExpenseRecordOfEachMoneyAccountValidator,
@@ -219,13 +220,13 @@ appsRouter.get(
 
 /**
  * Description: Get information of history of expense record (filter over time)
- * Path: /expense-record/:time
+ * Path: /expense-record/history/:start_time?/:end_time?
  * Method: GET
  * Header: { Authorization: Bearer <access_token> }
- * Params: { time: string (get all: all, get by month: mm-yyyy) }
+ * Params: { start_time: string (Date dd-MM-yyy), end_time: string (Date dd-MM-yyy) }
  */
 appsRouter.get(
-  '/expense-record/:time',
+  '/expense-record/history/:start_time?/:end_time?',
   accessTokenValidator,
   verifiedUserValidator,
   getHistoryOfExpenseRecordValidator,
