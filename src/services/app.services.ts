@@ -801,8 +801,7 @@ class AppServices {
 
   async getExpenseRecordOfEachMoneyAccount(user_id: string, payload: ExpenseRecordOfEachMoneyAccountReqParams) {
     let result: WithId<ExpenseRecordWithCashFlowType>[] = []
-    // Kiểm tra nếu all thì lấy hết không theo time
-    if (payload.time === 'all') {
+    if (!payload.start_time && !payload.end_time) {
       result = await databaseService.expenseRecords
         .find({
           user_id: new ObjectId(user_id),
@@ -810,8 +809,6 @@ class AppServices {
         })
         .toArray()
     } else {
-      // Lấy tháng và năm từ time và chuyển thành dạng số với map(Number)
-      const [month, year] = payload.time.split('-').map(Number)
       /*
         Date.UTC đảm bảo rằng ngày được tạo theo giờ phối hợp quốc tế (UTC) để tránh các vấn đề liên quan đến múi giờ
           - month - 1: chỉ mục tháng JS bắt đầu từ 0 -> trừ 1 để được tháng chính xác
@@ -819,9 +816,32 @@ class AppServices {
           - 0, 0, 0: giờ, phút và giây được đặt thành 0
           - Tương tự endDate nhưng lấy ngày cuối cùng của tháng 23, 59, 59 -> 11:59:59 PM và 999 milliseconds
       */
-      const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0))
-      const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
-
+      // Khởi tạo biến chứa thời gian
+      let startDate: Date = new Date()
+      let endDate: Date = new Date()
+      /*
+        Nếu có thời gian bắt đầu và không có thời gian kết thúc 
+        -> Hôm nay
+        -> Lấy ngày tháng năm tại thời gian bắt đầu -> Thời gian kết thúc sẽ là cuối ngày đó
+      */
+      if (payload.start_time && !payload.end_time) {
+        const [startDay, startMonth, startYear] = payload.start_time.split('-').map(Number)
+        startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay, 0, 0, 0, 0))
+        endDate = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
+      }
+      /*
+        Nếu có thời gian bắt đầu và có thời gian kết thúc
+        -> Lấy ngày tháng năm tại thời gian bắt đầu, thời gian kết thúc (cuối ngày)
+      */
+      if (payload.start_time && payload.end_time) {
+        const [startDay, startMonth, startYear] = payload.start_time.split('-').map(Number)
+        // Tạo đối tượng Date cho ngày bắt đầu (00:00:00)
+        startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay, 0, 0, 0, 0))
+        const [endDay, endMonth, endYear] = payload.end_time.split('-').map(Number)
+        // Tạo đối tượng Date cho ngày kết thúc (23:59:59.999)
+        endDate = new Date(Date.UTC(endYear, endMonth - 1, endDay, 23, 59, 59, 999))
+      }
+      // Lấy tất cả các bản ghi chi tiêu của user_id
       result = await databaseService.expenseRecords
         .find({
           user_id: new ObjectId(user_id),
@@ -925,16 +945,13 @@ class AppServices {
 
   async getHistoryOfExpenseRecord(user_id: string, payload: HistoryOfExpenseRecordReqParams) {
     let result: WithId<ExpenseRecordWithCashFlowType>[] = []
-    // Kiểm tra nếu all thì lấy hết không theo time
-    if (payload.time === 'all') {
+    if (!payload.start_time && !payload.end_time) {
       result = await databaseService.expenseRecords
         .find({
           user_id: new ObjectId(user_id)
         })
         .toArray()
     } else {
-      // Lấy tháng và năm từ time và chuyển thành dạng số với map(Number)
-      const [month, year] = payload.time.split('-').map(Number)
       /*
         Date.UTC đảm bảo rằng ngày được tạo theo giờ phối hợp quốc tế (UTC) để tránh các vấn đề liên quan đến múi giờ
           - month - 1: chỉ mục tháng JS bắt đầu từ 0 -> trừ 1 để được tháng chính xác
@@ -942,9 +959,32 @@ class AppServices {
           - 0, 0, 0: giờ, phút và giây được đặt thành 0
           - Tương tự endDate nhưng lấy ngày cuối cùng của tháng 23, 59, 59 -> 11:59:59 PM và 999 milliseconds
       */
-      const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0))
-      const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
-
+      // Khởi tạo biến chứa thời gian
+      let startDate: Date = new Date()
+      let endDate: Date = new Date()
+      /*
+        Nếu có thời gian bắt đầu và không có thời gian kết thúc 
+        -> Hôm nay
+        -> Lấy ngày tháng năm tại thời gian bắt đầu -> Thời gian kết thúc sẽ là cuối ngày đó
+      */
+      if (payload.start_time && !payload.end_time) {
+        const [startDay, startMonth, startYear] = payload.start_time.split('-').map(Number)
+        startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay, 0, 0, 0, 0))
+        endDate = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
+      }
+      /*
+        Nếu có thời gian bắt đầu và có thời gian kết thúc
+        -> Lấy ngày tháng năm tại thời gian bắt đầu, thời gian kết thúc (cuối ngày)
+      */
+      if (payload.start_time && payload.end_time) {
+        const [startDay, startMonth, startYear] = payload.start_time.split('-').map(Number)
+        // Tạo đối tượng Date cho ngày bắt đầu (00:00:00)
+        startDate = new Date(Date.UTC(startYear, startMonth - 1, startDay, 0, 0, 0, 0))
+        const [endDay, endMonth, endYear] = payload.end_time.split('-').map(Number)
+        // Tạo đối tượng Date cho ngày kết thúc (23:59:59.999)
+        endDate = new Date(Date.UTC(endYear, endMonth - 1, endDay, 23, 59, 59, 999))
+      }
+      // Lấy tất cả các bản ghi chi tiêu của user_id
       result = await databaseService.expenseRecords
         .find({
           user_id: new ObjectId(user_id),

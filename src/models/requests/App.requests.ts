@@ -73,11 +73,13 @@ export interface UpdateExpenseRecordReqBody {
 
 export interface ExpenseRecordOfEachMoneyAccountReqParams extends ParamsDictionary {
   money_account_id: string
-  time: string
+  start_time: string
+  end_time: string
 }
 
 export interface HistoryOfExpenseRecordReqParams extends ParamsDictionary {
-  time: string
+  start_time: string
+  end_time: string
 }
 
 export interface ExpenseRecordForStatisticsReqParams extends ParamsDictionary {

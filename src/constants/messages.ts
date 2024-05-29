@@ -136,6 +136,7 @@ export const APP_MESSAGES = {
   TIME_TO_GET_EXPENSE_RECORD_MUST_BE_A_STRING: 'Thời gian lấy bản ghi chi tiêu phải là chuỗi',
   TIME_TO_GET_EXPENSE_RECORD_IS_REQUIRED: 'Thời gian lấy bản ghi chi tiêu là bắt buộc',
   END_TIME_MUST_BE_THE_DAY_BEHIN_START_TIME: 'Thời gian kết thúc phải là ngày phía sau của thời gian bắt đầu',
+  DAY_MUST_BE_BETWEEN_1_AND_31: 'Ngày phải từ 1 đến 31',
   MONTH_MUST_BE_BETWEEN_1_AND_12: 'Tháng phải từ 1 đến 12',
   YEAR_MUST_BE_GREATER_THAN_2000: 'Năm phải từ 2000 trở đi',
   YEAR_MUST_BE_LESS_THAN_2100: 'Năm phải từ 2100 trở lại',
