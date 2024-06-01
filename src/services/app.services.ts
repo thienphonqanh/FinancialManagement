@@ -13,11 +13,13 @@ import {
   ExpenseRecordReqBody,
   HistoryOfExpenseRecordReqParams,
   MoneyAccountReqBody,
+  SpendingLimitReqBody,
   UpdateExpenseRecordReqBody,
   UpdateMoneyAccountReqBody
 } from '~/models/requests/App.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 import { CashFlowType } from '~/constants/enums'
+import SpendingLimit from '~/models/schemas/SpendingLimit.schemas'
 
 interface CashFlowCategoryResponseType {
   parent_category: CashFlowCategoryType
@@ -1148,6 +1150,32 @@ class AppServices {
       ])
     }
     return APP_MESSAGES.DELETE_EXPENSE_RECORD_SUCCESS
+  }
+
+  async addSpendingLimit(payload: SpendingLimitReqBody) {
+    /*
+      Ở payload giá trị nhận được ở trong cash_flow_category_id và money_account_id là mảng các string
+      -> Duyệt mảng và chuyển lần lượt các id dạng string thành ObjectId
+      -> Đưa vào mảng mới
+      -> Gán mảng mới vào lại payload để thêm mới
+    */
+    const newCashFlowCategories = payload.cash_flow_category_id.map((item) => new ObjectId(item))
+    const newMoneyAccounts = payload.money_account_id.map((item) => new ObjectId(item))
+    // Gán ngược lại cho payload
+    payload.cash_flow_category_id = newCashFlowCategories
+    payload.money_account_id = newMoneyAccounts
+    if (payload.end_time !== undefined) {
+      payload.end_time = new Date(payload.end_time)
+    }
+    // Tạo đối tượng SpendingLimit từ payload
+    const spendingLimit = new SpendingLimit({
+      ...payload,
+      amount_of_money: new Decimal128(payload.amount_of_money),
+      repeat: new ObjectId(payload.repeat),
+      start_time: new Date(payload.start_time)
+    })
+    await databaseService.spendingLimits.insertOne(spendingLimit)
+    return APP_MESSAGES.ADD_SPENDING_LIMIT_SUCCESS
   }
 }
 

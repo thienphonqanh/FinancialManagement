@@ -12,6 +12,7 @@ import {
   ExpenseRecordReqBody,
   HistoryOfExpenseRecordReqParams,
   MoneyAccountReqBody,
+  SpendingLimitReqBody,
   UpdateExpenseRecordReqBody
 } from '~/models/requests/App.requests'
 
@@ -162,5 +163,16 @@ export const deleteMoneyAccountController = async (
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const result = await appServices.deleteMoneyAccount(user_id, req.params)
+  return res.json({ result })
+}
+
+export const addSpendingLimitController = async (
+  req: Request<ParamsDictionary, any, SpendingLimitReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  req.body.user_id = new ObjectId(user_id)
+  const result = await appServices.addSpendingLimit(req.body)
   return res.json({ result })
 }

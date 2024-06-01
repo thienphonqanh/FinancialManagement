@@ -4,8 +4,11 @@ import {
   CashflowCategoryReqBody,
   CashflowReqBody,
   DeleteCashflowReqParams,
+  DeleteRepeatSpendingLimitReqParams,
   MoneyAccountTypeReqBody,
-  UpdateCashflowReqBody
+  RepeatSpendingLimitReqBody,
+  UpdateCashflowReqBody,
+  UpdateRepeatSpendingLimitReqBody
 } from '~/models/requests/Admin.requests'
 import { TokenPayload } from '~/models/requests/User.requests'
 import adminsService from '~/services/admins.services'
@@ -53,5 +56,34 @@ export const addMoneyAccountTypeController = async (
   next: NextFunction
 ) => {
   const result = await adminsService.addMoneyAccountType(req.body)
+  return res.json({ result })
+}
+
+export const addRepeatSpendingLimitController = async (
+  req: Request<ParamsDictionary, any, RepeatSpendingLimitReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const result = await adminsService.addRepeatSpendingLimit(req.body)
+  return res.json({ result })
+}
+
+export const updateRepeatSpendingLimitController = async (
+  req: Request<ParamsDictionary, any, UpdateRepeatSpendingLimitReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await adminsService.updateRepeatSpendingLimit(req.body)
+  return res.json({ result })
+}
+
+export const deleteRepeatSpendingLimitController = async (
+  req: Request<DeleteRepeatSpendingLimitReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { repeat_spending_limit_id } = req.params
+  const result = await adminsService.deleteRepeatSpendingLimit(repeat_spending_limit_id)
   return res.json({ result })
 }

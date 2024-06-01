@@ -7,6 +7,7 @@ import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { Request } from 'express'
 import { CashFlowType } from '~/constants/enums'
+import { wrapRequestHandler } from '~/utils/handlers'
 
 const accountBalanceSchema: ParamSchema = {
   notEmpty: {
@@ -599,3 +600,101 @@ export const getExpenseRecordForStatisticsValidator = validate(
 )
 
 export const deleteMoneyAccountValidator = validate(checkSchema({ money_account_id: moneyAccountId }, ['params']))
+
+export const spendingLimitValidator = validate(
+  checkSchema(
+    {
+      amount_of_money: amountOfMoneySchema,
+      name: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.SPENDING_LIMIT_NAME_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: APP_MESSAGES.SPENDING_LIMIT_NAME_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value) => {
+            const isExist = await databaseService.spendingLimits.findOne({ name: value })
+            if (isExist !== null) {
+              throw new Error(APP_MESSAGES.SPENDING_LIMIT_NAME_IS_EXIST)
+            }
+            return true
+          }
+        }
+      },
+      repeat: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.REPEAT_SPENDING_LIMIT_ID_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: APP_MESSAGES.REPEAT_SPENDING_LIMIT_ID_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new Error(APP_MESSAGES.REPEAT_SPENDING_LIMIT_NOT_FOUND)
+            }
+            const isValid = await databaseService.repeatSpendingLimits.findOne({ _id: new ObjectId(value) })
+            if (isValid === null) {
+              throw new Error(APP_MESSAGES.REPEAT_SPENDING_LIMIT_NOT_FOUND)
+            }
+          }
+        }
+      },
+      cash_flow_category_id: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_IS_REQUIRED
+        },
+        isArray: {
+          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_MUST_BE_AN_ARRAY
+        },
+        custom: {
+          options: async (value) => {
+            await Promise.all(
+              value.map(async (item: string) => {
+                if (!ObjectId.isValid(item)) {
+                  throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+                }
+                const isValid = await databaseService.cashFlowCategories.findOne({ _id: new ObjectId(item) })
+                if (isValid === null) {
+                  throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+                }
+              })
+            )
+          }
+        }
+      },
+      money_account_id: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_IS_REQUIRED
+        },
+        isArray: {
+          errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_MUST_BE_AN_ARRAY
+        },
+        custom: {
+          options: async (value) => {
+            await Promise.all(
+              value.map(async (item: string) => {
+                if (!ObjectId.isValid(item)) {
+                  throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
+                }
+                const isValid = await databaseService.moneyAccounts.findOne({ _id: new ObjectId(item) })
+                if (isValid === null) {
+                  throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
+                }
+              })
+            )
+          }
+        }
+      },
+      start_time: dateSchema,
+      end_time: {
+        optional: true,
+        ...dateSchema
+      }
+    },
+    ['body']
+  )
+)

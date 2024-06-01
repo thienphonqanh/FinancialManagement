@@ -71,6 +71,39 @@ const isChosenSchema: ParamSchema = {
   }
 }
 
+const nameOfRepeatSpendingLimitSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: ADMINS_MESSAGES.REPEAT_SPENDING_LIMIT_NAME_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: ADMINS_MESSAGES.REPEAT_SPENDING_LIMIT_NAME_MUST_BE_A_STRING
+  },
+  custom: {
+    options: async (value) => {
+      const isExist = await databaseService.repeatSpendingLimits.findOne({ name: value })
+      if (isExist !== null) {
+        throw new Error(ADMINS_MESSAGES.REPEAT_SPENDING_LIMIT_NAME_IS_EXIST)
+      }
+      return true
+    }
+  }
+}
+
+const repeatSpendingLimitIdSchema: ParamSchema = {
+  custom: {
+    options: async (value) => {
+      if (!ObjectId.isValid(value)) {
+        throw new Error(ADMINS_MESSAGES.REPEAT_SPENDING_LIMIT_TYPE_NOT_FOUND)
+      }
+      const isExist = await databaseService.repeatSpendingLimits.findOne({ _id: new ObjectId(value as string) })
+      if (isExist === null) {
+        throw new Error(ADMINS_MESSAGES.REPEAT_SPENDING_LIMIT_TYPE_NOT_FOUND)
+      }
+      return true
+    }
+  }
+}
+
 // Validator cho thêm dòng tiền (addCashFlow)
 export const cashFlowValidator = validate(
   checkSchema(
@@ -284,5 +317,33 @@ export const moneyAccountTypeValidator = validate(
       icon: iconSchema
     },
     ['body']
+  )
+)
+
+export const repeatSpendingLimitValidator = validate(
+  checkSchema(
+    {
+      name: nameOfRepeatSpendingLimitSchema
+    },
+    ['body']
+  )
+)
+
+export const updateRepeatSpendingLimitValidator = validate(
+  checkSchema(
+    {
+      repeat_spending_limit_id: repeatSpendingLimitIdSchema,
+      name: nameOfRepeatSpendingLimitSchema
+    },
+    ['body']
+  )
+)
+
+export const deleteRepeatSpendingLimitValidator = validate(
+  checkSchema(
+    {
+      repeat_spending_limit_id: repeatSpendingLimitIdSchema
+    },
+    ['params']
   )
 )

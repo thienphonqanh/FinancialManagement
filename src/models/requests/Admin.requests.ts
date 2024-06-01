@@ -31,3 +31,16 @@ export interface MoneyAccountTypeReqBody {
   icon: string
   name: string
 }
+
+export interface RepeatSpendingLimitReqBody {
+  name: string
+}
+
+export interface UpdateRepeatSpendingLimitReqBody {
+  repeat_spending_limit_id: ObjectId
+  name: string
+}
+
+export interface DeleteRepeatSpendingLimitReqParams extends ParamsDictionary {
+  repeat_spending_limit_id: string
+}

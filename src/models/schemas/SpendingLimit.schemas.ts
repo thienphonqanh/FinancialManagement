@@ -4,6 +4,7 @@ interface SpendingLimitType {
   _id?: ObjectId
   amount_of_money: Decimal128
   name: string
+  user_id: ObjectId
   cash_flow_category_id: ObjectId[]
   money_account_id: ObjectId[]
   repeat: ObjectId
@@ -17,6 +18,7 @@ export default class SpendingLimit {
   _id?: ObjectId
   amount_of_money: Decimal128
   name: string
+  user_id: ObjectId
   cash_flow_category_id: ObjectId[]
   money_account_id: ObjectId[]
   repeat: ObjectId
@@ -30,6 +32,7 @@ export default class SpendingLimit {
     this._id = spendingLimitType._id
     this.amount_of_money = spendingLimitType.amount_of_money
     this.name = spendingLimitType.name
+    this.user_id = spendingLimitType.user_id
     this.cash_flow_category_id = spendingLimitType.cash_flow_category_id
     this.money_account_id = spendingLimitType.money_account_id
     this.repeat = spendingLimitType.repeat
