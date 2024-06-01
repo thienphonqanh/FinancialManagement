@@ -7,6 +7,7 @@ import RefreshToken from '~/models/schemas/Refresh.schemas'
 import MoneyAccountType from '~/models/schemas/MoneyAccountType.schemas'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 import { envConfig } from '~/constants/configs'
+import SpendingLimit from '~/models/schemas/SpendingLimit.schemas'
 
 const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@financialmanagement.kiplzgn.mongodb.net/`
 
@@ -56,6 +57,10 @@ class DatabaseService {
 
   get expenseRecords(): Collection<ExpenseRecord> {
     return this.db.collection(envConfig.dbExpenseRecordsCollection)
+  }
+
+  get spendingLimits(): Collection<SpendingLimit> {
+    return this.db.collection(envConfig.dbSpendingLimitsCollection)
   }
 }
 
