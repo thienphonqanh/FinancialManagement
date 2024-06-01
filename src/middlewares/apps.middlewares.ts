@@ -698,3 +698,31 @@ export const spendingLimitValidator = validate(
     ['body']
   )
 )
+
+export const deleteSpendingLimitValidator = validate(
+  checkSchema(
+    {
+      spending_limit_id: {
+        notEmpty: {
+          errorMessage: APP_MESSAGES.SPENDING_LIMIT_ID_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: APP_MESSAGES.SPENDING_LIMIT_ID_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new Error(APP_MESSAGES.SPENDING_LIMIT_NOT_FOUND)
+            }
+            const isValid = await databaseService.spendingLimits.findOne({ _id: new ObjectId(value) })
+            if (isValid === null) {
+              throw new Error(APP_MESSAGES.SPENDING_LIMIT_NOT_FOUND)
+            }
+          }
+        }
+      }
+    },
+    ['params']
+  )
+)

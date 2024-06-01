@@ -6,8 +6,8 @@ import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { APP_MESSAGES } from '~/constants/messages'
 import {
   DeleteExpenseRecordReqParams,
-  DeleteMoneyAccountReqBody,
   DeleteMoneyAccountReqParams,
+  DeleteSpendingLimitReqParams,
   ExpenseRecordForStatisticsReqParams,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
@@ -1176,6 +1176,14 @@ class AppServices {
     })
     await databaseService.spendingLimits.insertOne(spendingLimit)
     return APP_MESSAGES.ADD_SPENDING_LIMIT_SUCCESS
+  }
+
+  async deleteSpendingLimit(user_id: string, payload: DeleteSpendingLimitReqParams) {
+    await databaseService.spendingLimits.deleteOne({
+      _id: new ObjectId(payload.spending_limit_id),
+      user_id: new ObjectId(user_id)
+    })
+    return APP_MESSAGES.DELETE_SPENDING_LIMIT_SUCCESS
   }
 }
 
