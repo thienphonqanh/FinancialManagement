@@ -9,9 +9,12 @@ import {
   CashflowCategoryReqBody,
   CashflowReqBody,
   MoneyAccountTypeReqBody,
-  UpdateCashflowReqBody
+  RepeatSpendingLimitReqBody,
+  UpdateCashflowReqBody,
+  UpdateRepeatSpendingLimitReqBody
 } from '~/models/requests/Admin.requests'
 import { CashFlowType } from '~/constants/enums'
+import SpendingLimitRepeat from '~/models/schemas/SpendingLimitRepeat.schemas'
 class AdminsService {
   // Thêm mới dòng tiền
   async addCashflow(payload: CashflowReqBody) {
@@ -110,6 +113,36 @@ class AdminsService {
     })
     await databaseService.moneyAccountTypes.insertOne(moneyAccountType)
     return ADMINS_MESSAGES.ADD_MONEY_ACCOUNT_TYPE_SUCCESS
+  }
+
+  // Thêm mới loại lặp lại của hạn mức chi tiêu
+  async addRepeatSpendingLimit(payload: RepeatSpendingLimitReqBody) {
+    const repeatSpendingLimit = new SpendingLimitRepeat({
+      name: payload.name
+    })
+    await databaseService.repeatSpendingLimits.insertOne(repeatSpendingLimit)
+    return ADMINS_MESSAGES.ADD_REPEAT_SPENDING_LIMIT_SUCCESS
+  }
+
+  // Sửa loại lặp lại của hạn mức chi tiêu
+  async updateRepeatSpendingLimit(payload: UpdateRepeatSpendingLimitReqBody) {
+    await databaseService.repeatSpendingLimits.updateOne({ _id: new ObjectId(payload.repeat_spending_limit_id) }, [
+      {
+        $set: {
+          name: payload.name,
+          updated_at: '$$NOW'
+        }
+      }
+    ])
+    return ADMINS_MESSAGES.UPDATE_REPEAT_SPENDING_LIMIT_SUCCESS
+  }
+
+  // Xoá dòng tiền
+  async deleteRepeatSpendingLimit(repeat_spending_limit_id: string) {
+    await databaseService.repeatSpendingLimits.deleteOne({
+      _id: new ObjectId(repeat_spending_limit_id)
+    })
+    return ADMINS_MESSAGES.DELETE_REPEAT_SPENDING_LIMIT_SUCCESS
   }
 }
 

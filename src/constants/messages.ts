@@ -82,7 +82,14 @@ export const ADMINS_MESSAGES = {
   MONEY_ACCOUNT_TYPE_NAME_IS_EXIST: 'Tên loại tài khoản đã tồn tại',
   ADD_MONEY_ACCOUNT_TYPE_SUCCESS: 'Thêm loại tài khoản thành công',
   CAN_NOT_BE_BOTH_A_PARENT_AND_A_CHILD_CATEGORY: 'Không thể vừa là hạng mục cha vừa là hạng mục con',
-  MUST_BE_A_PARENT_OR_CHILD_CATEGORY: 'Phải là hạng mục cha hoặc hạng mục con'
+  MUST_BE_A_PARENT_OR_CHILD_CATEGORY: 'Phải là hạng mục cha hoặc hạng mục con',
+  REPEAT_SPENDING_LIMIT_NAME_IS_REQUIRED: 'Tên loại lặp lại hạn mức chi tiêu không được để trống',
+  REPEAT_SPENDING_LIMIT_NAME_MUST_BE_A_STRING: 'Tên loại lặp lại hạn mức chi tiêu phải là chuỗi',
+  REPEAT_SPENDING_LIMIT_NAME_IS_EXIST: 'Tên loại lặp lại hạn mức chi tiêu đã tồn tại',
+  ADD_REPEAT_SPENDING_LIMIT_SUCCESS: 'Thêm loại lặp lại hạn mức chi tiêu thành công',
+  UPDATE_REPEAT_SPENDING_LIMIT_SUCCESS: 'Sửa loại lặp lại hạn mức chi tiêu thành công',
+  REPEAT_SPENDING_LIMIT_TYPE_NOT_FOUND: 'Không tìm thấy loại lặp lại hạn mức chi tiêu',
+  DELETE_REPEAT_SPENDING_LIMIT_SUCCESS: 'Xoá loại lặp lại hạn mức chi tiêu thành công'
 } as const
 
 export const APP_MESSAGES = {
@@ -147,5 +154,14 @@ export const APP_MESSAGES = {
   ADD_EXPENSE_RECORD_SUCCESS: 'Thêm mới bản ghi chi tiêu thành công',
   UPDATE_EXPENSE_RECORD_SUCCESS: 'Sửa bản ghi chi tiêu thành công',
   DELETE_EXPENSE_RECORD_SUCCESS: 'Xoá bản ghi chi tiêu thành công',
-  UPDATE_MONEY_ACCOUNT_SUCCESS: 'Sửa tài khoản tiền thành công'
+  UPDATE_MONEY_ACCOUNT_SUCCESS: 'Sửa tài khoản tiền thành công',
+  SPENDING_LIMIT_NAME_IS_REQUIRED: 'Tên hạn mức chi tiêu không được để trống',
+  SPENDING_LIMIT_NAME_MUST_BE_A_STRING: 'Tên hạn mức chi tiêu phải là chuỗi',
+  SPENDING_LIMIT_NAME_IS_EXIST: 'Tên hạn mức chi tiêu đã tồn tại',
+  REPEAT_SPENDING_LIMIT_ID_IS_REQUIRED: 'ID loại lặp lại hạn mức chi tiêu không được để trống',
+  REPEAT_SPENDING_LIMIT_ID_MUST_BE_A_STRING: 'ID loại lặp lại hạn mức chi tiêu phải là chuỗi',
+  REPEAT_SPENDING_LIMIT_NOT_FOUND: 'Không tìm thấy loại lặp lại hạn mức chi tiêu',
+  ADD_SPENDING_LIMIT_SUCCESS: 'Thêm hạn mức chi tiêu thành công',
+  CASH_FLOW_CATEGORY_ID_MUST_BE_AN_ARRAY: 'Hạng mục của dòng tiền phải là mảng các ID',
+  MONEY_ACCOUNT_ID_MUST_BE_AN_ARRAY: 'Tài khoản tiền phải là mảng các ID'
 } as const

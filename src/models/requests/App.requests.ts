@@ -94,3 +94,14 @@ export interface DeleteExpenseRecordReqParams extends ParamsDictionary {
 export interface DeleteMoneyAccountReqParams extends ParamsDictionary {
   money_account_id: string
 }
+
+export interface SpendingLimitReqBody {
+  amount_of_money: string
+  name: string
+  user_id: ObjectId
+  cash_flow_category_id: ObjectId[]
+  money_account_id: ObjectId[]
+  repeat: ObjectId
+  start_time: Date
+  end_time?: Date
+}

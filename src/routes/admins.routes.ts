@@ -4,14 +4,20 @@ import {
   addCashFlowController,
   addMoneyAccountTypeController,
   updateCashFlowController,
-  deleteCashFlowController
+  deleteCashFlowController,
+  addRepeatSpendingLimitController,
+  updateRepeatSpendingLimitController,
+  deleteRepeatSpendingLimitController
 } from '~/controllers/admins.controllers'
 import {
   cashFlowCategoryValidator,
   cashFlowValidator,
   moneyAccountTypeValidator,
   updateCashFlowValidator,
-  deleteCashFlowValidator
+  deleteCashFlowValidator,
+  repeatSpendingLimitValidator,
+  updateRepeatSpendingLimitValidator,
+  deleteRepeatSpendingLimitValidator
 } from '~/middlewares/admins.middlewares'
 import { accessTokenValidator, userRoleValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -96,6 +102,54 @@ adminsRouter.post(
   verifiedUserValidator,
   moneyAccountTypeValidator,
   wrapRequestHandler(addMoneyAccountTypeController)
+)
+
+/**
+ * Description. Add new type of repeat in spending limit
+ * Path: /add-repeat-spending-limit
+ * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: { name: string }
+ */
+adminsRouter.post(
+  '/add-repeat-spending-limit',
+  accessTokenValidator,
+  userRoleValidator,
+  verifiedUserValidator,
+  repeatSpendingLimitValidator,
+  wrapRequestHandler(addRepeatSpendingLimitController)
+)
+
+/**
+ * Description. Update type of repeat in spending limit
+ * Path: /update-repeat-spending-limit
+ * Method: PATCH
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: { repeat_spending_limit_id: string (ObjectId), name: string }
+ */
+adminsRouter.patch(
+  '/update-repeat-spending-limit',
+  accessTokenValidator,
+  userRoleValidator,
+  verifiedUserValidator,
+  updateRepeatSpendingLimitValidator,
+  wrapRequestHandler(updateRepeatSpendingLimitController)
+)
+
+/**
+ * Description. Delete type of repeat in spending limit
+ * Path: /delete-repeat-spending-limit/:repeat_spending_limit_id
+ * Method: DELETE
+ * Header: { Authorization: Bearer <access_token> }
+ * Params: { repeat_spending_limit_id: string (ObjectId) }
+ */
+adminsRouter.delete(
+  '/delete-repeat-spending-limit/:repeat_spending_limit_id',
+  accessTokenValidator,
+  userRoleValidator,
+  verifiedUserValidator,
+  deleteRepeatSpendingLimitValidator,
+  wrapRequestHandler(deleteRepeatSpendingLimitController)
 )
 
 export default adminsRouter

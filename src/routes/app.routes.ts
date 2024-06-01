@@ -13,7 +13,8 @@ import {
   getExpenseRecordOfEachMoneyAccountController,
   getHistoryOfExpenseRecordController,
   deleteExpenseRecordController,
-  updateExpenseRecordController
+  updateExpenseRecordController,
+  addSpendingLimitController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
@@ -25,7 +26,8 @@ import {
   deleteExpenseRecordValidator,
   updateExpenseRecordValidator,
   getExpenseRecordForStatisticsValidator,
-  deleteMoneyAccountValidator
+  deleteMoneyAccountValidator,
+  spendingLimitValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -231,6 +233,27 @@ appsRouter.get(
   verifiedUserValidator,
   getHistoryOfExpenseRecordValidator,
   wrapRequestHandler(getHistoryOfExpenseRecordController)
+)
+
+/**
+ * Description: Add new spending limit of user
+ * Path: /spending-limit
+ * Method: POST
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: {
+ *  amount_of_money: string (Decimal128), name: string,
+ *  cash_flow_category_id: array (ObjectId[]), money_account_id: array (ObjectId[]),
+ *  repeat: string (ObjectId), start_time: date
+ * (Optional)
+ *  end_time: date
+ * }
+ */
+appsRouter.post(
+  '/add-spending-limit',
+  accessTokenValidator,
+  verifiedUserValidator,
+  spendingLimitValidator,
+  wrapRequestHandler(addSpendingLimitController)
 )
 
 export default appsRouter

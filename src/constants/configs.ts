@@ -21,6 +21,8 @@ export const envConfig = {
   dbCashFlowsCollection: process.env.DB_CASH_FLOWS_COLLECTION as string,
   dbCashFlowCategoriesCollection: process.env.DB_CASH_FLOW_CATEGORIES_COLLECTION as string,
   dbExpenseRecordsCollection: process.env.DB_EXPENSE_RECORDS_COLLECTION as string,
+  dbSpendingLimitsCollection: process.env.DB_SPENDING_LIMITS_COLLECTION as string,
+  dbRepeatSpendingLimitsCollection: process.env.DB_REPEAT_SPENDING_LIMITS_COLLECTION as string,
   passwordSecret: process.env.PASSWORD_SECRET as string,
   JWTSecretAccessToken: process.env.JWT_SECRET_ACCESS_TOKEN as string,
   JWTSecretRefreshToken: process.env.JWT_SECRET_REFRESH_TOKEN as string,
