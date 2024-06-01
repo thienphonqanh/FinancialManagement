@@ -105,3 +105,7 @@ export interface SpendingLimitReqBody {
   start_time: Date
   end_time?: Date
 }
+
+export interface DeleteSpendingLimitReqParams extends ParamsDictionary {
+  spending_limit_id: string
+}

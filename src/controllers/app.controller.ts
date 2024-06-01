@@ -7,6 +7,7 @@ import { Decimal128, ObjectId } from 'mongodb'
 import {
   DeleteExpenseRecordReqParams,
   DeleteMoneyAccountReqParams,
+  DeleteSpendingLimitReqParams,
   ExpenseRecordForStatisticsReqParams,
   ExpenseRecordOfEachMoneyAccountReqParams,
   ExpenseRecordReqBody,
@@ -174,5 +175,15 @@ export const addSpendingLimitController = async (
   const { user_id } = req.decoded_authorization as TokenPayload
   req.body.user_id = new ObjectId(user_id)
   const result = await appServices.addSpendingLimit(req.body)
+  return res.json({ result })
+}
+
+export const deleteSpendingLimitController = async (
+  req: Request<DeleteSpendingLimitReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await appServices.deleteSpendingLimit(user_id, req.params)
   return res.json({ result })
 }

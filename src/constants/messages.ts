@@ -163,5 +163,9 @@ export const APP_MESSAGES = {
   REPEAT_SPENDING_LIMIT_NOT_FOUND: 'Không tìm thấy loại lặp lại hạn mức chi tiêu',
   ADD_SPENDING_LIMIT_SUCCESS: 'Thêm hạn mức chi tiêu thành công',
   CASH_FLOW_CATEGORY_ID_MUST_BE_AN_ARRAY: 'Hạng mục của dòng tiền phải là mảng các ID',
-  MONEY_ACCOUNT_ID_MUST_BE_AN_ARRAY: 'Tài khoản tiền phải là mảng các ID'
+  MONEY_ACCOUNT_ID_MUST_BE_AN_ARRAY: 'Tài khoản tiền phải là mảng các ID',
+  SPENDING_LIMIT_ID_IS_REQUIRED: 'ID hạn mức chi tiêu không được để trống',
+  SPENDING_LIMIT_ID_MUST_BE_A_STRING: 'ID hạn mức chi tiêu phải là chuỗi',
+  SPENDING_LIMIT_NOT_FOUND: 'Không tìm thấy hạn mức chi tiêu',
+  DELETE_SPENDING_LIMIT_SUCCESS: 'Xoá hạn mức chi tiêu thành công'
 } as const
