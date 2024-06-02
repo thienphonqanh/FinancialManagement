@@ -15,7 +15,8 @@ import {
   deleteExpenseRecordController,
   updateExpenseRecordController,
   addSpendingLimitController,
-  deleteSpendingLimitController
+  deleteSpendingLimitController,
+  getSpendingLimitController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
@@ -29,7 +30,8 @@ import {
   getExpenseRecordForStatisticsValidator,
   deleteMoneyAccountValidator,
   spendingLimitValidator,
-  deleteSpendingLimitValidator
+  deleteSpendingLimitValidator,
+  getSpendingLimitValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -271,6 +273,21 @@ appsRouter.delete(
   verifiedUserValidator,
   deleteSpendingLimitValidator,
   wrapRequestHandler(deleteSpendingLimitController)
+)
+
+/**
+ * Description: Get information of spending limit
+ * Path: /spending-limit/:spending_limit_id
+ * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
+ * Params: { spending_limit_id: string (ObjectId) }
+ */
+appsRouter.get(
+  '/spending-limit/:spending_limit_id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  getSpendingLimitValidator,
+  wrapRequestHandler(getSpendingLimitController)
 )
 
 export default appsRouter

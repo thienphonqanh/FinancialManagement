@@ -7,7 +7,6 @@ import MoneyAccount from '~/models/schemas/MoneyAccount.schemas'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { Request } from 'express'
 import { CashFlowType } from '~/constants/enums'
-import { wrapRequestHandler } from '~/utils/handlers'
 
 const accountBalanceSchema: ParamSchema = {
   notEmpty: {
@@ -221,36 +220,6 @@ const dateSchema: ParamSchema = {
   }
 }
 
-const timeSchema: ParamSchema = {
-  notEmpty: {
-    errorMessage: APP_MESSAGES.TIME_TO_GET_EXPENSE_RECORD_IS_REQUIRED
-  },
-  isString: {
-    errorMessage: APP_MESSAGES.TIME_TO_GET_EXPENSE_RECORD_MUST_BE_A_STRING
-  },
-  custom: {
-    options: (value) => {
-      if (value === 'all') {
-        return true
-      }
-      const [month, year] = value.split('-').map(Number)
-      if (isNaN(month) || isNaN(year) || month === undefined || year === undefined) {
-        throw new Error(APP_MESSAGES.TIME_IS_NOT_FOUND)
-      }
-      if (month < 1 || month > 12) {
-        throw new Error(APP_MESSAGES.MONTH_MUST_BE_BETWEEN_1_AND_12)
-      }
-      if (year < 2000) {
-        throw new Error(APP_MESSAGES.YEAR_MUST_BE_GREATER_THAN_2000)
-      }
-      if (year > 2100) {
-        throw new Error(APP_MESSAGES.YEAR_MUST_BE_LESS_THAN_2100)
-      }
-      return true
-    }
-  }
-}
-
 const expenseRecordIdSchema: ParamSchema = {
   notEmpty: {
     errorMessage: APP_MESSAGES.EXPENSE_RECORD_ID_IS_REQUIRED
@@ -418,6 +387,27 @@ const startAndEndTimeSchema: ParamSchema = {
         throw new Error(APP_MESSAGES.YEAR_MUST_BE_LESS_THAN_2100)
       }
       return true
+    }
+  }
+}
+
+const spendingLimitIdSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: APP_MESSAGES.SPENDING_LIMIT_ID_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: APP_MESSAGES.SPENDING_LIMIT_ID_MUST_BE_A_STRING
+  },
+  trim: true,
+  custom: {
+    options: async (value: string) => {
+      if (!ObjectId.isValid(value)) {
+        throw new Error(APP_MESSAGES.SPENDING_LIMIT_NOT_FOUND)
+      }
+      const isValid = await databaseService.spendingLimits.findOne({ _id: new ObjectId(value) })
+      if (isValid === null) {
+        throw new Error(APP_MESSAGES.SPENDING_LIMIT_NOT_FOUND)
+      }
     }
   }
 }
@@ -702,26 +692,16 @@ export const spendingLimitValidator = validate(
 export const deleteSpendingLimitValidator = validate(
   checkSchema(
     {
-      spending_limit_id: {
-        notEmpty: {
-          errorMessage: APP_MESSAGES.SPENDING_LIMIT_ID_IS_REQUIRED
-        },
-        isString: {
-          errorMessage: APP_MESSAGES.SPENDING_LIMIT_ID_MUST_BE_A_STRING
-        },
-        trim: true,
-        custom: {
-          options: async (value: string) => {
-            if (!ObjectId.isValid(value)) {
-              throw new Error(APP_MESSAGES.SPENDING_LIMIT_NOT_FOUND)
-            }
-            const isValid = await databaseService.spendingLimits.findOne({ _id: new ObjectId(value) })
-            if (isValid === null) {
-              throw new Error(APP_MESSAGES.SPENDING_LIMIT_NOT_FOUND)
-            }
-          }
-        }
-      }
+      spending_limit_id: spendingLimitIdSchema
+    },
+    ['params']
+  )
+)
+
+export const getSpendingLimitValidator = validate(
+  checkSchema(
+    {
+      spending_limit_id: spendingLimitIdSchema
     },
     ['params']
   )

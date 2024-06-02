@@ -14,12 +14,14 @@ import {
   HistoryOfExpenseRecordReqParams,
   MoneyAccountReqBody,
   SpendingLimitReqBody,
+  SpendingLimitReqParams,
   UpdateExpenseRecordReqBody,
   UpdateMoneyAccountReqBody
 } from '~/models/requests/App.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 import { CashFlowType } from '~/constants/enums'
 import SpendingLimit from '~/models/schemas/SpendingLimit.schemas'
+import { differenceInDays } from 'date-fns'
 
 interface CashFlowCategoryResponseType {
   parent_category: CashFlowCategoryType
@@ -1184,6 +1186,117 @@ class AppServices {
       user_id: new ObjectId(user_id)
     })
     return APP_MESSAGES.DELETE_SPENDING_LIMIT_SUCCESS
+  }
+
+  async getSpendingLimit(user_id: string, payload: SpendingLimitReqParams) {
+    /*
+      Lấy ra bản ghi spending limit của user_id và spending_limit_id
+      -> Từ đó lấy ngày bắt đầu và ngày kết thúc
+      -> Tính toán tổng số ngày (từ bắt đầu đến kết thúc)
+      -> Tính toán số ngày đã chi tiêu
+      -> Lấy ra các bản ghi chi tiêu trong khoảng thời gian đó
+      -> Lọc ra các bản ghi chi tiêu thuộc spending limit (cash_flow_type = Spending (0)) 
+      -> Tính các thông tin
+    */
+    const result = await databaseService.spendingLimits.findOne(
+      {
+        user_id: new ObjectId(user_id),
+        _id: new ObjectId(payload.spending_limit_id)
+      },
+      { projection: { created_at: 0, updated_at: 0 } }
+    )
+
+    let startTime: Date = new Date()
+    let endTime: Date = new Date()
+    let numberOfDaysSpending: number = 0
+    if (result !== null) {
+      if (result.start_time !== undefined && result.end_time === null) {
+        const getStartTime = result.start_time.toISOString().split('T')[0]
+        const [startYear, startMonth, startDay] = getStartTime.split('-').map(Number)
+        startTime = new Date(getStartTime)
+        endTime = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
+        // Hàm differenceInDays trả về số ngày giữa 2 thời gian
+        numberOfDaysSpending = differenceInDays(endTime, startTime)
+      }
+      if (result.start_time !== undefined && result.end_time !== null && result.end_time !== undefined) {
+        const getStartTime = result.start_time.toISOString().split('T')[0]
+        const getEndTime = result.end_time.toISOString().split('T')[0]
+        const [startYear, startMonth, startDay] = getEndTime.split('-').map(Number)
+        startTime = new Date(getStartTime)
+        endTime = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
+        // Hàm differenceInDays trả về số ngày giữa 2 thời gian
+        numberOfDaysSpending = differenceInDays(endTime, startTime)
+      }
+    }
+    // Tính thời gian đã chi tiêu (ngày hiện tại - ngày bắt đầu)
+    const currentTime = new Date().toISOString()
+    const timeSpending = differenceInDays(currentTime, startTime)
+    // Lấy ra các bản ghi chi tiêu của user_id trong khoảng thời gian bắt đầu và kết thúc
+    const getExpenseRecord = await databaseService.expenseRecords
+      .find(
+        { user_id: new ObjectId(user_id), occur_date: { $gte: startTime, $lte: endTime } },
+        { projection: { created_at: 0, updated_at: 0 } }
+      )
+      .toArray()
+    // Lọc ra các bản ghi chi tiêu thuộc spending limit (cash_flow_type = Spending (0))
+    const getExpenseRecordOfSpendingLimit = await Promise.all(
+      getExpenseRecord.map(async (item) => {
+        const checkCashFlowType = await databaseService.cashFlowCategories.findOne(
+          {
+            $or: [{ _id: item.cash_flow_category_id }, { 'sub_category._id': item.cash_flow_category_id }]
+          },
+          { projection: { cash_flow_type: 1 } }
+        )
+
+        if (checkCashFlowType !== null && checkCashFlowType.cash_flow_type !== CashFlowType.Revenue) {
+          return item
+        }
+        return null
+      })
+    )
+    // Lọc ra các bản ghi chi tiêu thuộc spending limit (cash_flow_type = Spending (0)) và khác null
+    // Mảng getExpenseRecordOfSpendingLimit khi chưa lọc sẽ chứa các bản ghi chi tiêu thuộc spending limit và null (null vì thuộc Revenue)
+    const filterExpenseRecordOfSpendingLimit = getExpenseRecordOfSpendingLimit.filter((item) => item !== null)
+    // Tính tổng số tiền đã chi tiêu dựa trên các bản ghi
+    const totalAmountSpending = filterExpenseRecordOfSpendingLimit.reduce((sum, item) => {
+      if (item !== null) {
+        return sum + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString())
+      }
+      return sum
+    }, 0)
+    // Tính số tiền còn lại của spending limit
+    const remainingAmountOfLimit =
+      parseFloat((result as WithId<SpendingLimit>).amount_of_money.toString()) - totalAmountSpending
+    // Tính số ngày còn lại (tổng số ngày - số ngày đã chi tiêu)
+    const remainingDays = numberOfDaysSpending - timeSpending
+    // Tính số tiền thực tế đã chi tiêu (tổng số tiền đã chi tiêu / số ngày đã chi tiêu)
+    // Nếu số ngày đã chi tiêu = 0 thì số tiền thực tế đã chi tiêu = 0
+    let actualSpending = totalAmountSpending / timeSpending
+    if (timeSpending === 0) {
+      actualSpending = 0
+    }
+    // Tính số tiền nên chi tiêu (số tiền còn lại / số ngày còn lại)
+    // Nếu số ngày còn lại <= 0 thì số tiền nên chi tiêu = 0
+    let shouldSpending = remainingAmountOfLimit / remainingDays
+    if (remainingDays <= 0) {
+      shouldSpending = 0
+    }
+    // Tính số tiền dự kiến cần chi tiêu (số tiền thực tế đã chi tiêu * số ngày còn lại + tổng số tiền đã chi tiêu)
+    // Nếu số ngày còn lại < 0 thì số tiền dự kiến cần chi tiêu = 0
+    let expectedSpending = actualSpending * remainingDays + totalAmountSpending
+    if (remainingDays < 0) {
+      expectedSpending = 0
+    }
+    const response_spending_limit = {
+      ...result,
+      expense_records: filterExpenseRecordOfSpendingLimit,
+      remaining_amount_of_limit: new Decimal128(remainingAmountOfLimit.toString()),
+      total_amount_spending: new Decimal128(totalAmountSpending.toString()),
+      actual_spending: new Decimal128(actualSpending.toString()),
+      should_spending: new Decimal128(shouldSpending.toString()),
+      expected_spending: new Decimal128(expectedSpending.toString())
+    }
+    return response_spending_limit
   }
 }
 

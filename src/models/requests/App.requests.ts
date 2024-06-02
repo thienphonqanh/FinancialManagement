@@ -109,3 +109,7 @@ export interface SpendingLimitReqBody {
 export interface DeleteSpendingLimitReqParams extends ParamsDictionary {
   spending_limit_id: string
 }
+
+export interface SpendingLimitReqParams extends ParamsDictionary {
+  spending_limit_id: string
+}
