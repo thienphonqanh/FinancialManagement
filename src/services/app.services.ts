@@ -1241,15 +1241,38 @@ class AppServices {
     // Lọc ra các bản ghi chi tiêu thuộc spending limit (cash_flow_type = Spending (0))
     const getExpenseRecordOfSpendingLimit = await Promise.all(
       getExpenseRecord.map(async (item) => {
-        const checkCashFlowType = await databaseService.cashFlowCategories.findOne(
+        const cashFlowCategories = await databaseService.cashFlowCategories.findOne(
           {
             $or: [{ _id: item.cash_flow_category_id }, { 'sub_category._id': item.cash_flow_category_id }]
           },
-          { projection: { cash_flow_type: 1 } }
+          { projection: { created_at: 0, updated_at: 0 } }
         )
-
-        if (checkCashFlowType !== null && checkCashFlowType.cash_flow_type !== CashFlowType.Revenue) {
-          return item
+        // Kiểm tra id trùng với parent hay sub để thêm name, icon, cash_flow_type, cash_flow_id
+        if (cashFlowCategories !== null) {
+          if (cashFlowCategories._id.equals(item.cash_flow_category_id)) {
+            if (cashFlowCategories.cash_flow_type !== CashFlowType.Revenue) {
+              return Object.assign(item, {
+                icon: cashFlowCategories.icon,
+                name: cashFlowCategories.name,
+                cash_flow_type: cashFlowCategories.cash_flow_type,
+                cash_flow_id: cashFlowCategories.cash_flow_id
+              })
+            }
+          } else if (cashFlowCategories.sub_category) {
+            const subCategory = cashFlowCategories.sub_category.find((sub: CashFlowSubCategory) =>
+              sub._id.equals(item.cash_flow_category_id)
+            )
+            if (subCategory) {
+              if (cashFlowCategories.cash_flow_type !== CashFlowType.Revenue) {
+                return Object.assign(item, {
+                  icon: (subCategory as CashFlowSubCategory).icon,
+                  name: (subCategory as CashFlowSubCategory).name,
+                  cash_flow_type: cashFlowCategories.cash_flow_type,
+                  cash_flow_id: cashFlowCategories.cash_flow_id
+                })
+              }
+            }
+          }
         }
         return null
       })
