@@ -647,7 +647,9 @@ export const spendingLimitValidator = validate(
                 if (!ObjectId.isValid(item)) {
                   throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
                 }
-                const isValid = await databaseService.cashFlowCategories.findOne({ _id: new ObjectId(item) })
+                const isValid = await databaseService.cashFlowCategories.findOne({
+                  $or: [{ _id: new ObjectId(item) }, { 'sub_category._id': new ObjectId(item) }]
+                })
                 if (isValid === null) {
                   throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
                 }
