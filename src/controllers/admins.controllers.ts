@@ -87,3 +87,8 @@ export const deleteRepeatSpendingLimitController = async (
   const result = await adminsService.deleteRepeatSpendingLimit(repeat_spending_limit_id)
   return res.json({ result })
 }
+
+export const getInfoRepeatSpendingLimitController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await adminsService.getInfoRepeatSpendingLimit()
+  return res.json({ result })
+}

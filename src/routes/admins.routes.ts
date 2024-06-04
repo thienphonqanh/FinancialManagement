@@ -7,7 +7,8 @@ import {
   deleteCashFlowController,
   addRepeatSpendingLimitController,
   updateRepeatSpendingLimitController,
-  deleteRepeatSpendingLimitController
+  deleteRepeatSpendingLimitController,
+  getInfoRepeatSpendingLimitController
 } from '~/controllers/admins.controllers'
 import {
   cashFlowCategoryValidator,
@@ -103,6 +104,14 @@ adminsRouter.post(
   moneyAccountTypeValidator,
   wrapRequestHandler(addMoneyAccountTypeController)
 )
+
+/**
+ * Description: Get information of all repeat spending limit
+ * Path: /repeat-spending-limit
+ * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
+ */
+adminsRouter.get('/repeat-spending-limit', wrapRequestHandler(getInfoRepeatSpendingLimitController))
 
 /**
  * Description. Add new type of repeat in spending limit
