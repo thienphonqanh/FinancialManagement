@@ -1231,13 +1231,30 @@ class AppServices {
     // Tính thời gian đã chi tiêu (ngày hiện tại - ngày bắt đầu)
     const currentTime = new Date().toISOString()
     const timeSpending = differenceInDays(currentTime, startTime)
-    // Lấy ra các bản ghi chi tiêu của user_id trong khoảng thời gian bắt đầu và kết thúc
-    const getExpenseRecord = await databaseService.expenseRecords
-      .find(
-        { user_id: new ObjectId(user_id), occur_date: { $gte: startTime, $lte: endTime } },
-        { projection: { created_at: 0, updated_at: 0 } }
+    /*
+      Lấy ra các bản ghi chi tiêu của user_id trong khoảng thời gian bắt đầu và kết thúc
+      Chỉ lấy những bản ghi có money_account_id là các tài khoản được chọn trong hạn mức
+      Đưa vào mảng getExpenseRecord
+    */
+    const getExpenseRecord: WithId<ExpenseRecord>[] = []
+    if (result && result.money_account_id) {
+      await Promise.all(
+        result.money_account_id.map(async (item) => {
+          const getExpenseRecordOfEachMoneyAccount = await databaseService.expenseRecords
+            .find(
+              {
+                user_id: new ObjectId(user_id),
+                money_account_id: new ObjectId(item),
+                occur_date: { $gte: startTime, $lte: endTime }
+              },
+              { projection: { created_at: 0, updated_at: 0 } }
+            )
+            .toArray()
+
+          getExpenseRecord.push(...getExpenseRecordOfEachMoneyAccount)
+        })
       )
-      .toArray()
+    }
     // Lọc ra các bản ghi chi tiêu thuộc spending limit (cash_flow_type = Spending (0))
     const getExpenseRecordOfSpendingLimit = await Promise.all(
       getExpenseRecord.map(async (item) => {
