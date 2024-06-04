@@ -19,7 +19,7 @@ import {
   UpdateMoneyAccountReqBody
 } from '~/models/requests/App.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
-import { CashFlowType } from '~/constants/enums'
+import { CashFlowType, IncludedReport } from '~/constants/enums'
 import SpendingLimit from '~/models/schemas/SpendingLimit.schemas'
 import { differenceInDays } from 'date-fns'
 
@@ -535,7 +535,8 @@ class AppServices {
     if (!payload.start_time && !payload.end_time) {
       result = await databaseService.expenseRecords
         .find({
-          user_id: new ObjectId(user_id)
+          user_id: new ObjectId(user_id),
+          report: IncludedReport.Included
         })
         .toArray()
     } else {
@@ -575,6 +576,7 @@ class AppServices {
       result = await databaseService.expenseRecords
         .find({
           user_id: new ObjectId(user_id),
+          report: IncludedReport.Included,
           // Lấy các bản ghi trong khoảng thời gian startDate và endDate ($lte: less than or equal, $gte: greater than or equal)
           occur_date: { $gte: new Date(startDate), $lte: new Date(endDate) }
         })
