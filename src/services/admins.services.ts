@@ -144,6 +144,14 @@ class AdminsService {
     })
     return ADMINS_MESSAGES.DELETE_REPEAT_SPENDING_LIMIT_SUCCESS
   }
+
+  // Lấy danh sách hạn mức chi tiêu
+  async getInfoRepeatSpendingLimit() {
+    const result = await databaseService.repeatSpendingLimits
+      .find({}, { projection: { created_at: 0, updated_at: 0 } })
+      .toArray()
+    return result
+  }
 }
 
 const adminsService = new AdminsService()
