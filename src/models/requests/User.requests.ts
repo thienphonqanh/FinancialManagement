@@ -39,6 +39,10 @@ export interface RefreshTokenReqBody {
   refresh_token: string
 }
 
+export interface ChangePasswordReqBody {
+  password: string
+}
+
 export interface UpdateMeReqBody {
   name?: string
   dob?: Date
