@@ -1219,7 +1219,7 @@ class AppServices {
         startTime = new Date(getStartTime)
         endTime = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
         // Hàm differenceInDays trả về số ngày giữa 2 thời gian
-        numberOfDaysSpending = differenceInDays(endTime, startTime)
+        numberOfDaysSpending = differenceInDays(endTime, startTime) + 1
       }
       if (result.start_time !== undefined && result.end_time !== null && result.end_time !== undefined) {
         const getStartTime = result.start_time.toISOString().split('T')[0]
@@ -1228,12 +1228,12 @@ class AppServices {
         startTime = new Date(getStartTime)
         endTime = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
         // Hàm differenceInDays trả về số ngày giữa 2 thời gian
-        numberOfDaysSpending = differenceInDays(endTime, startTime)
+        numberOfDaysSpending = differenceInDays(endTime, startTime) + 1
       }
     }
     // Tính thời gian đã chi tiêu (ngày hiện tại - ngày bắt đầu)
     const currentTime = new Date().toISOString()
-    const timeSpending = differenceInDays(currentTime, startTime)
+    const timeSpending = differenceInDays(currentTime, startTime) + 1
     /*
       Lấy ra các bản ghi chi tiêu của user_id trong khoảng thời gian bắt đầu và kết thúc
       Chỉ lấy những bản ghi có money_account_id là các tài khoản được chọn trong hạn mức
