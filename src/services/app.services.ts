@@ -1319,8 +1319,12 @@ class AppServices {
     }
     // Tính số tiền nên chi tiêu (số tiền còn lại / số ngày còn lại)
     // Nếu số ngày còn lại <= 0 thì số tiền nên chi tiêu = 0
+    // Nếu số tiền nên chi tiêu < 0 -> 0
     let shouldSpending = remainingAmountOfLimit / remainingDays
     if (remainingDays <= 0) {
+      shouldSpending = 0
+    }
+    if (shouldSpending < 0) {
       shouldSpending = 0
     }
     // Tính số tiền dự kiến cần chi tiêu (số tiền thực tế đã chi tiêu * số ngày còn lại + tổng số tiền đã chi tiêu)
