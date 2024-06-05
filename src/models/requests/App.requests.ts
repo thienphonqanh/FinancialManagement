@@ -113,3 +113,15 @@ export interface DeleteSpendingLimitReqParams extends ParamsDictionary {
 export interface SpendingLimitReqParams extends ParamsDictionary {
   spending_limit_id: string
 }
+
+export interface UpdateSpendingLimitReqBody {
+  spending_limit_id?: ObjectId
+  amount_of_money: Decimal128
+  name: string
+  user_id: ObjectId
+  cash_flow_category_id: ObjectId[]
+  money_account_id: ObjectId[]
+  repeat: ObjectId
+  start_time: Date
+  end_time?: Date
+}

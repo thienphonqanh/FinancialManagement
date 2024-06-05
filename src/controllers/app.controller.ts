@@ -15,7 +15,8 @@ import {
   MoneyAccountReqBody,
   SpendingLimitReqBody,
   SpendingLimitReqParams,
-  UpdateExpenseRecordReqBody
+  UpdateExpenseRecordReqBody,
+  UpdateSpendingLimitReqBody
 } from '~/models/requests/App.requests'
 
 export const getCashFlowController = async (req: Request, res: Response, next: NextFunction) => {
@@ -202,5 +203,15 @@ export const getSpendingLimitController = async (
 export const getAllSpendingLimitController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const result = await appServices.getAllSpendingLimit(user_id)
+  return res.json({ result })
+}
+
+export const updateSpendingLimitController = async (
+  req: Request<ParamsDictionary, any, UpdateSpendingLimitReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await appServices.updateSpendingLimit(user_id, req.body)
   return res.json({ result })
 }

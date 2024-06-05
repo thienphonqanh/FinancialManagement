@@ -169,5 +169,6 @@ export const APP_MESSAGES = {
   SPENDING_LIMIT_ID_IS_REQUIRED: 'ID hạn mức chi tiêu không được để trống',
   SPENDING_LIMIT_ID_MUST_BE_A_STRING: 'ID hạn mức chi tiêu phải là chuỗi',
   SPENDING_LIMIT_NOT_FOUND: 'Không tìm thấy hạn mức chi tiêu',
-  DELETE_SPENDING_LIMIT_SUCCESS: 'Xoá hạn mức chi tiêu thành công'
+  DELETE_SPENDING_LIMIT_SUCCESS: 'Xoá hạn mức chi tiêu thành công',
+  UPDATE_SPENDING_LIMIT_SUCCESS: 'Sửa hạn mức chi tiêu thành công'
 } as const
