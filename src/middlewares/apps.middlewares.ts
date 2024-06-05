@@ -412,6 +412,110 @@ const spendingLimitIdSchema: ParamSchema = {
   }
 }
 
+const nameOfSpendingLimitSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: APP_MESSAGES.SPENDING_LIMIT_NAME_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: APP_MESSAGES.SPENDING_LIMIT_NAME_MUST_BE_A_STRING
+  },
+  trim: true,
+  custom: {
+    options: async (value, { req }) => {
+      if (req.body.spending_limit_id !== undefined) {
+        const checkNameSpendingLimit = await databaseService.spendingLimits.findOne(
+          {
+            _id: new ObjectId(req.body.spending_limit_id as string)
+          },
+          { projection: { name: 1 } }
+        )
+        if (checkNameSpendingLimit === null) {
+          throw new Error(APP_MESSAGES.SPENDING_LIMIT_NOT_FOUND)
+        }
+        if (checkNameSpendingLimit.name === value) {
+          return true
+        }
+      }
+      const isExist = await databaseService.spendingLimits.findOne({ name: value })
+      if (isExist !== null) {
+        throw new Error(APP_MESSAGES.SPENDING_LIMIT_NAME_IS_EXIST)
+      }
+      return true
+    }
+  }
+}
+
+const repeatSpendingLimitSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: APP_MESSAGES.REPEAT_SPENDING_LIMIT_ID_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: APP_MESSAGES.REPEAT_SPENDING_LIMIT_ID_MUST_BE_A_STRING
+  },
+  trim: true,
+  custom: {
+    options: async (value: string) => {
+      if (!ObjectId.isValid(value)) {
+        throw new Error(APP_MESSAGES.REPEAT_SPENDING_LIMIT_NOT_FOUND)
+      }
+      const isValid = await databaseService.repeatSpendingLimits.findOne({ _id: new ObjectId(value) })
+      if (isValid === null) {
+        throw new Error(APP_MESSAGES.REPEAT_SPENDING_LIMIT_NOT_FOUND)
+      }
+    }
+  }
+}
+
+const cashFlowCategoryIdSpendingLimitSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_IS_REQUIRED
+  },
+  isArray: {
+    errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_MUST_BE_AN_ARRAY
+  },
+  custom: {
+    options: async (value) => {
+      await Promise.all(
+        value.map(async (item: string) => {
+          if (!ObjectId.isValid(item)) {
+            throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+          }
+          const isValid = await databaseService.cashFlowCategories.findOne({
+            $or: [{ _id: new ObjectId(item) }, { 'sub_category._id': new ObjectId(item) }]
+          })
+          if (isValid === null) {
+            throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
+          }
+        })
+      )
+    }
+  }
+}
+
+const moneyAccountIdSpendingLimitSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_IS_REQUIRED
+  },
+  isArray: {
+    errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_MUST_BE_AN_ARRAY
+  },
+  custom: {
+    options: async (value) => {
+      await Promise.all(
+        value.map(async (item: string) => {
+          if (!ObjectId.isValid(item)) {
+            throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
+          }
+          const isValid = await databaseService.moneyAccounts.findOne({ _id: new ObjectId(item) })
+          if (isValid === null) {
+            throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
+          }
+        })
+      )
+    }
+  }
+}
+
 // Validator cho thêm mới tài khoản tiền
 export const moneyAccountValidator = validate(
   checkSchema(
@@ -595,92 +699,10 @@ export const spendingLimitValidator = validate(
   checkSchema(
     {
       amount_of_money: amountOfMoneySchema,
-      name: {
-        notEmpty: {
-          errorMessage: APP_MESSAGES.SPENDING_LIMIT_NAME_IS_REQUIRED
-        },
-        isString: {
-          errorMessage: APP_MESSAGES.SPENDING_LIMIT_NAME_MUST_BE_A_STRING
-        },
-        trim: true,
-        custom: {
-          options: async (value) => {
-            const isExist = await databaseService.spendingLimits.findOne({ name: value })
-            if (isExist !== null) {
-              throw new Error(APP_MESSAGES.SPENDING_LIMIT_NAME_IS_EXIST)
-            }
-            return true
-          }
-        }
-      },
-      repeat: {
-        notEmpty: {
-          errorMessage: APP_MESSAGES.REPEAT_SPENDING_LIMIT_ID_IS_REQUIRED
-        },
-        isString: {
-          errorMessage: APP_MESSAGES.REPEAT_SPENDING_LIMIT_ID_MUST_BE_A_STRING
-        },
-        trim: true,
-        custom: {
-          options: async (value: string) => {
-            if (!ObjectId.isValid(value)) {
-              throw new Error(APP_MESSAGES.REPEAT_SPENDING_LIMIT_NOT_FOUND)
-            }
-            const isValid = await databaseService.repeatSpendingLimits.findOne({ _id: new ObjectId(value) })
-            if (isValid === null) {
-              throw new Error(APP_MESSAGES.REPEAT_SPENDING_LIMIT_NOT_FOUND)
-            }
-          }
-        }
-      },
-      cash_flow_category_id: {
-        notEmpty: {
-          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_IS_REQUIRED
-        },
-        isArray: {
-          errorMessage: APP_MESSAGES.CASH_FLOW_CATEGORY_ID_MUST_BE_AN_ARRAY
-        },
-        custom: {
-          options: async (value) => {
-            await Promise.all(
-              value.map(async (item: string) => {
-                if (!ObjectId.isValid(item)) {
-                  throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
-                }
-                const isValid = await databaseService.cashFlowCategories.findOne({
-                  $or: [{ _id: new ObjectId(item) }, { 'sub_category._id': new ObjectId(item) }]
-                })
-                if (isValid === null) {
-                  throw new Error(APP_MESSAGES.CASH_FLOW_CATEGORY_NOT_FOUND)
-                }
-              })
-            )
-          }
-        }
-      },
-      money_account_id: {
-        notEmpty: {
-          errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_IS_REQUIRED
-        },
-        isArray: {
-          errorMessage: APP_MESSAGES.MONEY_ACCOUNT_ID_MUST_BE_AN_ARRAY
-        },
-        custom: {
-          options: async (value) => {
-            await Promise.all(
-              value.map(async (item: string) => {
-                if (!ObjectId.isValid(item)) {
-                  throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
-                }
-                const isValid = await databaseService.moneyAccounts.findOne({ _id: new ObjectId(item) })
-                if (isValid === null) {
-                  throw new Error(APP_MESSAGES.MONEY_ACCOUNT_NOT_FOUND)
-                }
-              })
-            )
-          }
-        }
-      },
+      name: nameOfSpendingLimitSchema,
+      repeat: repeatSpendingLimitSchema,
+      cash_flow_category_id: cashFlowCategoryIdSpendingLimitSchema,
+      money_account_id: moneyAccountIdSpendingLimitSchema,
       start_time: dateSchema,
       end_time: {
         optional: true,
@@ -706,5 +728,42 @@ export const getSpendingLimitValidator = validate(
       spending_limit_id: spendingLimitIdSchema
     },
     ['params']
+  )
+)
+
+export const updateSpendingLimitValidator = validate(
+  checkSchema(
+    {
+      spending_limit_id: spendingLimitIdSchema,
+      amount_of_money: {
+        optional: true,
+        ...amountOfMoneySchema
+      },
+      name: {
+        optional: true,
+        ...nameOfSpendingLimitSchema
+      },
+      repeat: {
+        optional: true,
+        ...repeatSpendingLimitSchema
+      },
+      cash_flow_category_id: {
+        optional: true,
+        ...cashFlowCategoryIdSpendingLimitSchema
+      },
+      money_account_id: {
+        optional: true,
+        ...moneyAccountIdSpendingLimitSchema
+      },
+      start_time: {
+        optional: true,
+        ...dateSchema
+      },
+      end_time: {
+        optional: true,
+        ...dateSchema
+      }
+    },
+    ['body']
   )
 )

@@ -17,7 +17,8 @@ import {
   addSpendingLimitController,
   deleteSpendingLimitController,
   getSpendingLimitController,
-  getAllSpendingLimitController
+  getAllSpendingLimitController,
+  updateSpendingLimitController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
@@ -32,7 +33,8 @@ import {
   deleteMoneyAccountValidator,
   spendingLimitValidator,
   deleteSpendingLimitValidator,
-  getSpendingLimitValidator
+  getSpendingLimitValidator,
+  updateSpendingLimitValidator
 } from '~/middlewares/apps.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
@@ -303,6 +305,21 @@ appsRouter.get(
   accessTokenValidator,
   verifiedUserValidator,
   wrapRequestHandler(getAllSpendingLimitController)
+)
+
+/**
+ * Description: Update information of spending limit
+ * Path: /update-spending-limit
+ * Method: PATCH
+ * Header: { Authorization: Bearer <access_token> }
+ * Body: { spending_limit_id: string (ObjectId), SpendingLimitSchema }
+ */
+appsRouter.patch(
+  '/update-spending-limit',
+  accessTokenValidator,
+  verifiedUserValidator,
+  updateSpendingLimitValidator,
+  wrapRequestHandler(updateSpendingLimitController)
 )
 
 export default appsRouter

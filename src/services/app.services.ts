@@ -16,7 +16,8 @@ import {
   SpendingLimitReqBody,
   SpendingLimitReqParams,
   UpdateExpenseRecordReqBody,
-  UpdateMoneyAccountReqBody
+  UpdateMoneyAccountReqBody,
+  UpdateSpendingLimitReqBody
 } from '~/models/requests/App.requests'
 import ExpenseRecord from '~/models/schemas/ExpenseRecord.schemas'
 import { CashFlowType, IncludedReport } from '~/constants/enums'
@@ -1408,11 +1409,33 @@ class AppServices {
               },
               { projection: { created_at: 0, updated_at: 0 } }
             )
-
+            // Kiểm tra id trùng với parent hay sub để thêm name, icon, cash_flow_type, cash_flow_id
             if (cashFlowCategories !== null) {
-              return item
+              if (cashFlowCategories._id.equals(item.cash_flow_category_id)) {
+                if (cashFlowCategories.cash_flow_type !== CashFlowType.Revenue) {
+                  return Object.assign(item, {
+                    icon: cashFlowCategories.icon,
+                    name: cashFlowCategories.name,
+                    cash_flow_type: cashFlowCategories.cash_flow_type,
+                    cash_flow_id: cashFlowCategories.cash_flow_id
+                  })
+                }
+              } else if (cashFlowCategories.sub_category) {
+                const subCategory = cashFlowCategories.sub_category.find((sub: CashFlowSubCategory) =>
+                  sub._id.equals(item.cash_flow_category_id)
+                )
+                if (subCategory) {
+                  if (cashFlowCategories.cash_flow_type !== CashFlowType.Revenue) {
+                    return Object.assign(item, {
+                      icon: (subCategory as CashFlowSubCategory).icon,
+                      name: (subCategory as CashFlowSubCategory).name,
+                      cash_flow_type: cashFlowCategories.cash_flow_type,
+                      cash_flow_id: cashFlowCategories.cash_flow_id
+                    })
+                  }
+                }
+              }
             }
-
             return null
           })
         )
@@ -1426,17 +1449,60 @@ class AppServices {
           return sum
         }, 0)
 
-        const remainingAmountOfLimit =
-          parseFloat((result as WithId<SpendingLimit>).amount_of_money.toString()) - totalAmountSpending
-
         return {
           ...result,
-          remaining_amount_of_limit: new Decimal128(remainingAmountOfLimit.toString())
+          total_spending: new Decimal128(totalAmountSpending.toString())
         }
       })
     )
 
     return response_spending_limits
+  }
+
+  async updateSpendingLimit(user_id: string, payload: UpdateSpendingLimitReqBody) {
+    /*
+      Ở payload giá trị nhận được ở trong cash_flow_category_id và money_account_id là mảng các string
+      -> Duyệt mảng và chuyển lần lượt các id dạng string thành ObjectId
+      -> Đưa vào mảng mới
+      -> Gán mảng mới vào lại payload để thêm mới
+    */
+    // Gán spending_limit_id vào biến riêng và xóa khỏi payload -> ..payload sẽ không xuất hiện spending_limit_id khi update
+    const spendingLimitId = payload.spending_limit_id
+    delete payload.spending_limit_id
+    if (payload.cash_flow_category_id !== undefined) {
+      const newCashFlowCategories = payload.cash_flow_category_id.map((item) => new ObjectId(item))
+      // Gán ngược lại cho payload
+      payload.cash_flow_category_id = newCashFlowCategories
+    }
+    if (payload.money_account_id !== undefined) {
+      const newMoneyAccounts = payload.money_account_id.map((item) => new ObjectId(item))
+      // Gán ngược lại cho payload
+      payload.money_account_id = newMoneyAccounts
+    }
+    if (payload.end_time !== undefined) {
+      // Gán ngược lại cho payload
+      payload.end_time = new Date(payload.end_time)
+    }
+    if (payload.start_time !== undefined) {
+      // Gán ngược lại cho payload
+      payload.start_time = new Date(payload.start_time)
+    }
+    if (payload.amount_of_money !== undefined) {
+      // Gán ngược lại cho payload
+      payload.amount_of_money = new Decimal128(payload.amount_of_money.toString())
+    }
+    await databaseService.spendingLimits.updateOne(
+      { _id: new ObjectId(spendingLimitId), user_id: new ObjectId(user_id) },
+      [
+        {
+          $set: {
+            ...payload,
+            updated_at: '$$NOW'
+          }
+        }
+      ]
+    )
+    return APP_MESSAGES.UPDATE_SPENDING_LIMIT_SUCCESS
   }
 }
 
