@@ -198,3 +198,9 @@ export const getSpendingLimitController = async (
   const result = await appServices.getSpendingLimit(user_id, req.params)
   return res.json({ result })
 }
+
+export const getAllSpendingLimitController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await appServices.getAllSpendingLimit(user_id)
+  return res.json({ result })
+}
