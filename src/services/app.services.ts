@@ -1319,8 +1319,12 @@ class AppServices {
     }
     // Tính số tiền nên chi tiêu (số tiền còn lại / số ngày còn lại)
     // Nếu số ngày còn lại <= 0 thì số tiền nên chi tiêu = 0
+    // Nếu số tiền nên chi tiêu < 0 -> 0
     let shouldSpending = remainingAmountOfLimit / remainingDays
     if (remainingDays <= 0) {
+      shouldSpending = 0
+    }
+    if (shouldSpending < 0) {
       shouldSpending = 0
     }
     // Tính số tiền dự kiến cần chi tiêu (số tiền thực tế đã chi tiêu * số ngày còn lại + tổng số tiền đã chi tiêu)
@@ -1338,17 +1342,101 @@ class AppServices {
       should_spending: new Decimal128(shouldSpending.toString()),
       expected_spending: new Decimal128(expectedSpending.toString())
     }
+
     return response_spending_limit
   }
 
   async getAllSpendingLimit(user_id: string) {
-    const result = await databaseService.spendingLimits
-      .find(
-        { user_id: new ObjectId(user_id) },
-        { projection: { repeat: 0, money_account_id: 0, created_at: 0, updated_at: 0 } }
-      )
+    /*
+      Ở lấy all cách xử lý tương tự lấy riêng từng cái (khác là phải xử lý dạng mảng các item)
+      Lấy ra tất cả các bản ghi spending limit của user_id
+      -> Từ đó lấy ngày bắt đầu và ngày kết thúc
+      -> Tính toán tổng số ngày (từ bắt đầu đến kết thúc)
+      -> Tính toán số ngày đã chi tiêu
+      -> Lấy ra các bản ghi chi tiêu trong khoảng thời gian đó
+      -> Lọc ra các bản ghi chi tiêu thuộc spending limit (cash_flow_type = Spending (0))
+      -> Tính các thông tin
+    */
+    const results = await databaseService.spendingLimits
+      .find({ user_id: new ObjectId(user_id) }, { projection: { created_at: 0, updated_at: 0, repeat: 0 } })
       .toArray()
-    return result
+
+    const response_spending_limits = await Promise.all(
+      results.map(async (result) => {
+        let startTime: Date = new Date()
+        let endTime: Date = new Date()
+
+        if (result.start_time !== undefined && result.end_time === null) {
+          const getStartTime = result.start_time.toISOString().split('T')[0]
+          const [startYear, startMonth, startDay] = getStartTime.split('-').map(Number)
+          startTime = new Date(getStartTime)
+          endTime = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
+        }
+        if (result.start_time !== undefined && result.end_time !== null && result.end_time !== undefined) {
+          const getStartTime = result.start_time.toISOString().split('T')[0]
+          const getEndTime = result.end_time.toISOString().split('T')[0]
+          const [startYear, startMonth, startDay] = getEndTime.split('-').map(Number)
+          startTime = new Date(getStartTime)
+          endTime = new Date(Date.UTC(startYear, startMonth - 1, startDay, 23, 59, 59, 999))
+        }
+
+        const getExpenseRecord: WithId<ExpenseRecord>[] = []
+        if (result.money_account_id) {
+          await Promise.all(
+            result.money_account_id.map(async (item) => {
+              const getExpenseRecordOfEachMoneyAccount = await databaseService.expenseRecords
+                .find(
+                  {
+                    user_id: new ObjectId(user_id),
+                    money_account_id: new ObjectId(item),
+                    occur_date: { $gte: startTime, $lte: endTime }
+                  },
+                  { projection: { created_at: 0, updated_at: 0 } }
+                )
+                .toArray()
+
+              getExpenseRecord.push(...getExpenseRecordOfEachMoneyAccount)
+            })
+          )
+        }
+
+        const getExpenseRecordOfSpendingLimit = await Promise.all(
+          getExpenseRecord.map(async (item) => {
+            const cashFlowCategories = await databaseService.cashFlowCategories.findOne(
+              {
+                $or: [{ _id: item.cash_flow_category_id }, { 'sub_category._id': item.cash_flow_category_id }]
+              },
+              { projection: { created_at: 0, updated_at: 0 } }
+            )
+
+            if (cashFlowCategories !== null) {
+              return item
+            }
+
+            return null
+          })
+        )
+
+        const filterExpenseRecordOfSpendingLimit = getExpenseRecordOfSpendingLimit.filter((item) => item !== null)
+
+        const totalAmountSpending = filterExpenseRecordOfSpendingLimit.reduce((sum, item) => {
+          if (item !== null) {
+            return sum + parseFloat(item.amount_of_money.toString()) + parseFloat(item.cost_incurred.toString())
+          }
+          return sum
+        }, 0)
+
+        const remainingAmountOfLimit =
+          parseFloat((result as WithId<SpendingLimit>).amount_of_money.toString()) - totalAmountSpending
+
+        return {
+          ...result,
+          remaining_amount_of_limit: new Decimal128(remainingAmountOfLimit.toString())
+        }
+      })
+    )
+
+    return response_spending_limits
   }
 }
 
