@@ -16,7 +16,8 @@ import {
   updateExpenseRecordController,
   addSpendingLimitController,
   deleteSpendingLimitController,
-  getSpendingLimitController
+  getSpendingLimitController,
+  getAllSpendingLimitController
 } from '~/controllers/app.controller'
 import {
   moneyAccountValidator,
@@ -288,6 +289,20 @@ appsRouter.get(
   verifiedUserValidator,
   getSpendingLimitValidator,
   wrapRequestHandler(getSpendingLimitController)
+)
+
+/**
+ * Description: Get information of all spending limit
+ * Path: /spending-limit
+ * Method: GET
+ * Header: { Authorization: Bearer <access_token> }
+ * Params: { spending_limit_id: string (ObjectId) }
+ */
+appsRouter.get(
+  '/spending-limit',
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(getAllSpendingLimitController)
 )
 
 export default appsRouter

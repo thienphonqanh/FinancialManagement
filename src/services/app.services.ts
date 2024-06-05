@@ -1340,6 +1340,16 @@ class AppServices {
     }
     return response_spending_limit
   }
+
+  async getAllSpendingLimit(user_id: string) {
+    const result = await databaseService.spendingLimits
+      .find(
+        { user_id: new ObjectId(user_id) },
+        { projection: { repeat: 0, money_account_id: 0, created_at: 0, updated_at: 0 } }
+      )
+      .toArray()
+    return result
+  }
 }
 
 const appServices = new AppServices()
