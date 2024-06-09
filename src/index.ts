@@ -20,6 +20,11 @@ databaseService.connect()
 
 initFolder()
 app.use(express.json()) // Kích hoạt middleware -> chuyển đổi json trong HTTP thành JS Object
+app.get('/', (req, res) => {
+  res.send(
+    '<img src="https://www.pullrequest.com/blog/intro-to-using-typescript-in-a-nodejs-express-project/images/how-to-use-typescript-with-nodejs-and-express.jpg"'
+  )
+})
 app.use('/users', usersRouter) // Route cho người dùng
 app.use('/admins', adminsRouter) // Route cho quản trị viên
 app.use('/app', appsRouter) // Route cho quản trị viên
